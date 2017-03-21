@@ -1,0 +1,32 @@
+{% extends "header.html" %}
+
+{% block head %}
+  		width:64px;
+    	height:86px;
+{% endblock %}
+
+
+{% block body %}
+<body>
+
+	<h2>{{ session['username'] }}'s Watchlist:</h2>
+	<br>
+	<br>
+
+	<table class="table table-hover">
+
+		<tbody>
+			<th></th><th>Title</th><th>Rating</th>
+			{% for movie in res %}
+				<tr>
+				<td><a href= "{{ url_for('info', path = 'movies', object_id = movie.id) }}"><img src="{{ movie.poster }}"/></a></td>
+				<td><a href= "{{ url_for('info', path = 'movies', object_id = movie.id) }}">{{ movie.title }} ({{ movie.year }})</a></td>
+				<td> {{ movie.rating }}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+		
+	</table>
+
+</body>
+{% endblock %}

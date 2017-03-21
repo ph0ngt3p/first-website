@@ -1,0 +1,39 @@
+{% extends "header.html" %}
+
+{% block head %}
+      width:500px;
+      height:800px;
+{% endblock %}
+
+
+{% block body %}
+
+    <div class="container" style="height:100%;padding-top:10px">
+      <div class="well">
+        <div class="row">
+          <div class="col-md-6">
+              {% if res.profile_pic == None %}
+
+                  <img class="img-responsive" src="http://ia.media-imdb.com/images/G/01/imdb/images/nopicture/medium/name-2135195744._CB522736367_.png" alt="Actor Poster">
+
+              {% else %}
+
+                  <img class="img-responsive" src="{{ 'https://image.tmdb.org/t/p/w1000' + res.profile_pic }}" alt="Actor Poster">
+
+              {% endif %}
+          </div>
+          <div class="col-md-5">
+            <ul style="text-align:left">
+              <li>{{ res.name }}</li>
+              <li>{{ res.place_of_birth }}</li>
+              <li>{{ res.biography }}</li>
+              <li>{{ res.birthday }}</li>
+              <li>{{ res.deathday }}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+{% endblock %}

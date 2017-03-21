@@ -1,0 +1,89 @@
+{% extends "header.html" %}
+
+{% block head %}
+      width:250px;
+      height:390px;
+{% endblock %}
+
+
+{% block body %}
+
+<head>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<script type="text/javascript">
+	    $(document).ready(function() {
+		    $('#watchlistbutton').click(function() {
+		            // alert($(this).val());
+		            $.ajax({
+		            	url: '{{ url_for('modify_watchlist') }}', 
+		            	data: { movieid: {{ res.id }} } 
+		            });
+					return false;
+		        });
+		    });
+		function changeText(){
+	        $('#watchlistbutton').val($('#watchlistbutton').val() == 'Add to Watchlist' ? 'Remove from Watchlist' : 'Add to Watchlist');
+	    }
+	</script>
+</head>
+
+<body>
+
+    <h2><strong>{{ res.title }} (<a href="#">{{ res.year }}</a>) </strong></h2>
+
+    <div class="container" style="height:100%;padding-top:20px">
+      <div class="well">
+        <div class="row">
+          <div class="col-md-6">
+              <img class="img-responsive" src="{{ res.poster }}" alt="Movie Poster">
+
+              {% if session.logged_in %}
+              <input id="watchlistbutton" type="button" name="add" value="{{ btn }}" onclick="changeText()">
+              {% else %}
+              <a href="{{ url_for('register_page') }}"><input type="button" name="add" value="{{ btn }}"></a>
+              {% endif %}
+          </div>
+          <div class="col-md-5">
+            <ul class="none-bullet" style="text-align:left">
+              <h3><li><strong>{{ res.rating }}/10 </strong>({{ res.votes }} votes)</li></h3>
+              <br>
+              <br>
+              <li><strong>Genre: </strong><a href="#">{{ res.genre }}</a></li>
+              <li><strong>Plot: </strong>{{ res.plot }}</li>
+              <li><strong>Director: </strong>{{ res.director }}</li>
+              <li><strong>Writer: </strong>{{ res.writer }}</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+    <h4>Top billed casts:</h4>
+
+    <div class="container" style="height:100%;padding-top:10px">
+      <div class="well">
+        <div class="row">
+          <div class="col-md-5">
+            <ul class="none-bullet">
+              {% for actor in actors %}
+                
+                {% if actor.profile_pic == None %}
+                  <li><img id=profilePic src="http://ia.media-imdb.com/images/G/01/imdb/images/nopicture/medium/name-2135195744._CB522736367_.png" alt="Actor Poster">&nbsp;&nbsp;&nbsp;<a href="{{ url_for('info', path = 'actors', object_id = actor.id) }}">{{ actor.name }}</a></li>
+                  <br>
+                {% else %}
+                  <li><img id=profilePic src="{{ 'https://image.tmdb.org/t/p/w1000' + actor.profile_pic }}" alt="Actor Poster">&nbsp;&nbsp;&nbsp;<a href="{{ url_for('info', path = 'actors', object_id = actor.id) }}">{{ actor.name }}</a></li>
+                  <br>
+
+                {% endif %}
+                    
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+</body>
+    
+
+
+{% endblock %}
