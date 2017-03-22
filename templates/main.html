@@ -5,21 +5,73 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"/>
+  <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
 
   <link href="{{ url_for('static', filename = 'css/jquery.bxslider.css') }}" rel="stylesheet" />
   <link href="{{ url_for('static', filename = 'css/scrolling-nav.css') }}" rel="stylesheet">
   <script src="{{ url_for('static', filename = 'js/jquery.easing.min.js') }}"></script>
   <script src="{{ url_for('static', filename = 'js/scrolling-nav.js') }}"></script>
-  <script src="{{ url_for('static', filename = 'js/jquery.js') }}"></script>
-  <script src="{{ url_for('static', filename = 'js/bootstrap.js') }}"></script>
+  <script src="//code.jquery.com/jquery-1.12.4.js"></script>
+  <script type="text/javascript" src="{{ url_for('static', filename = 'js/jquery.tablesorter.js') }}"></script> 
+
+  	<script type="text/javascript">
+	$(document).ready(function() 
+	    { 
+	        $("#movietable").tablesorter(); 
+	    } 
+	); 
+	</script>
 
   <style>
   img {
   	width:64px;
     height:86px;
   }
+
+	#movietable {
+	  margin: 0 auto;
+	  font-size: 1.2em;
+	  margin-bottom: 15px;
+	}
+
+
+	#movietable thead {
+	  cursor: pointer;
+	  background: #c9dff0;
+	}
+	#movietable thead tr th { 
+	  font-weight: bold;
+	  padding: 12px 30px;
+	  padding-left: 42px;
+	}
+	#movietable thead tr th span { 
+	  padding-right: 20px;
+	  background-repeat: no-repeat;
+	  background-position: 100% 100%;
+	}
+
+	#movietable thead tr th.headerSortUp, #movietable thead tr th.headerSortDown {
+	  background: #acc8dd;
+	}
+
+	#movietable thead tr th.headerSortUp span {
+	  	background-image: url('http://i.imgur.com/RkA9MBo.png');
+	}
+	#movietable thead tr th.headerSortDown span {
+		background-image: url('http://i.imgur.com/SP99ZPJ.png');
+	}
+
+
+	#movietable tbody tr { 
+	  color: #555;
+	}
+	#movietable tbody tr td {
+	  text-align: center;
+	  padding: 15px 10px;
+	}
+	#movietable tbody tr td.lalign {
+	  text-align: left;
+	}
 
   .none-bullet {
     list-style-type: none;
@@ -72,7 +124,7 @@
 	          <a class="dropdown-toggle" data-toggle="dropdown" href="#">Top movies by genre <span class="caret"></span></a>
 	          <ul class="dropdown-menu">
 	            {% for t in CONTENT["Top genre"] %}
-	     			<li><a href="{{url_for('homepage', path = t)}}">{{t}}</a></li>
+	     			<li><a href="{{url_for('movie_list', path = t)}}">{{t}}</a></li>
 	   			{% endfor %}
 	          </ul>
 	        </li>
@@ -145,42 +197,24 @@
 	  {% endif %}
 	{% endwith %}
 
-		<table class="table table-hover">
+	<table id="movietable" class="table table-hover">
+		<thead>
+			<tr><th></th><th><span>Title</span></th><th><span>Year</span></th><th><span>Rating</span></th></tr>
+		</thead>
 
-		 	{% if path == '' %}
-
-				<p>SORT BY:
-						<a href="{{ url_for('sort_movies', p1 = 'rating', p2 = 'asc') }}" class="dropup">Rating<span class="caret"></span></a>
-						<span>|</span>
-						<a href="{{ url_for('sort_movies', p1 = 'year', p2 = 'asc') }}" class="dropup">Release Year<span class="caret"></span></a>
-				</p>
-
-			{% endif %}
-
-			{% if path in CONTENT["Top genre"] %}
-
-				<p>SORT BY:
-						<a href="{{ url_for('sort_movies', path = path, p1 = 'rating', p2 = 'asc') }}" class="dropup">Rating<span class="caret"></span></a>
-						<span>|</span>
-						<a href="{{ url_for('sort_movies', path = path, p1 = 'year', p2 = 'asc') }}" class="dropup">Release Year<span class="caret"></span></a>
-				</p>
-
-			{% endif %}
-
-				<tbody>
-					<th></th><th>Title</th><th>Rating</th>
-					{% for movie in res %}
-						<tr>
-						<td><a href= "{{ url_for('info', path = 'movies', object_id = movie.id) }}"><img src="{{ movie.poster }}"/></a></td>
-						<td><a href= "{{ url_for('info', path = 'movies', object_id = movie.id) }}">{{ movie.title }} ({{ movie.year }})</a></td>
-						<td> {{ movie.rating }}</td>
-						</tr>
-					{% endfor %}
-				</tbody>
-			</table>
+		<tbody>
+			{% for movie in res %}
+				<tr>
+				<td><a href= "{{ url_for('info', path = 'movies', object_id = movie.id) }}"><img src="{{ movie.poster }}"/></a></td>
+				<td><a href= "{{ url_for('info', path = 'movies', object_id = movie.id) }}">{{ movie.title }}</a></td>
+				<td>{{ movie.year }}</td>
+				<td>{{ movie.rating }}</td>
+				</tr>
+			{% endfor %}
+		</tbody>
+	</table>
 	</div>
-	<script src="//code.jquery.com/jquery-1.11.1.min.js"></script>
-	<script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>	
+	<script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 </body>
 </html>
 

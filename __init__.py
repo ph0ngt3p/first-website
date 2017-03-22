@@ -27,7 +27,7 @@ def login_required(f):
             return f(*args, **kwargs)
         else:
             flash("You need to login first")
-            return redirect(url_for('homepage'))
+            return redirect(url_for('movie_list'))
 
     return wrap
 
@@ -39,7 +39,7 @@ def get_watchlist(name):
 
 @app.route('/', defaults = {'path': ''})
 @app.route('/genre/<path:path>/')
-def homepage(path):
+def movie_list(path):
     if path is '':
         res = Movies.query.all()
     elif path in CONTENT["Top genre"]:
@@ -81,7 +81,7 @@ def register_page():
                 session['logged_in'] = True
                 session['username'] = username
 
-                return redirect(url_for('homepage'))
+                return redirect(url_for('movie_list'))
 
         return render_template("register.html", form=form, CONTENT = CONTENT)
 
@@ -108,26 +108,12 @@ def login():
 
         gc.collect()
 
-        return redirect(url_for("homepage"))
+        return redirect(url_for("movie_list"))
 
     except Exception as e:
         # flash(str(e))
         flash("Invalid credentials, try again.")
-        return redirect(url_for("homepage"))
-
-
-@app.route('/<string:p1>-<string:p2>/', defaults = {'path': ''})
-@app.route('/genre/<path:path>/<string:p1>-<string:p2>/')
-def sort_movies(path, p1, p2):
-    if path is '':
-        res = Movies.query.all()
-        return render_template('sorted_all.html', res = res, CONTENT = CONTENT, p1 = p1, p2 = p2)
-    elif path in CONTENT["Top genre"]:
-        genr = '%{0}%'.format(path)
-        res = Movies.query.filter(Movies.genre.ilike(genr))
-        return render_template('sorted_genre.html', res = res, CONTENT = CONTENT, p1 = p1, p2 = p2, path = path)
-    else:
-        abort(404)
+        return redirect(url_for("movie_list"))
 
 
 @app.route('/<path:path>/id/<object_id>/')
@@ -174,7 +160,7 @@ def logout():
     session.clear()
     flash("You have been logged out!")
     gc.collect()
-    return redirect(url_for('homepage'))
+    return redirect(url_for('movie_list'))
 
 @app.route('/modify_watchlist/')
 @login_required

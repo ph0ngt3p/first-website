@@ -13,19 +13,23 @@
 	<br>
 	<br>
 
-	<table class="table table-hover">
+	<table id="movietable" class="table table-hover">
+
+		<thead>
+			<tr><th></th><th><span>Title</span></th><th><span>Year</span></th><th><span>Rating</span></th></tr>
+		</thead>
 
 		<tbody>
-			<th></th><th>Title</th><th>Rating</th>
 			{% for movie in watchlist %}
 				<tr>
 				<td><a href= "{{ url_for('info', path = 'movies', object_id = movie.id) }}"><img src="{{ movie.poster }}"/></a></td>
-				<td><a href= "{{ url_for('info', path = 'movies', object_id = movie.id) }}">{{ movie.title }} ({{ movie.year }})</a></td>
-				<td> {{ movie.rating }}</td>
+				<td><a href= "{{ url_for('info', path = 'movies', object_id = movie.id) }}">{{ movie.title }}</a></td>
+				<td>{{ movie.year }}</td>
+				<td>{{ movie.rating }}</td>
 				</tr>
 			{% endfor %}
 		</tbody>
-		
+
 	</table>
 
 </body>
