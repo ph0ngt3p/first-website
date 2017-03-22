@@ -82,7 +82,7 @@
 	   			{% endfor %}
 	          </ul>
 	        </li>
-	        <li><a href="/watchlist/{{ session['username'] }}">My watchlist</a></li>
+	        <li><a href="{{ url_for('watchlist', name = session['username']) }}">My watchlist</a></li>
 	      </ul>
 	      <form class="navbar-form navbar-right" action="/search_result/" method="POST">
 	      <div class="input-group">

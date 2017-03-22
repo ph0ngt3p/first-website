@@ -4,6 +4,7 @@ from content_management import Content
 from db_connection import dbconn
 from reg_form import RegistrationForm
 from passlib.hash import sha256_crypt
+from functools import wraps
 import gc
 
 CONTENT = Content()
@@ -16,7 +17,24 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:%(pw)s@%(host)s:%
 
 db.init_app(app)
 
-from models import Actors, Movies
+from models import Actors, Movies, Users
+
+
+def login_required(f):
+    @wraps(f)
+    def wrap(*args, **kwargs):
+        if 'logged_in' in session:
+            return f(*args, **kwargs)
+        else:
+            flash("You need to login first")
+            return redirect(url_for('homepage'))
+
+    return wrap
+
+
+def get_watchlist(name):
+	user = Users.query.filter_by(username = name).one()
+	return Movies.query.filter(Movies.users.any(id = user.id)).all()
 
 
 @app.route('/', defaults = {'path': ''})
@@ -31,62 +49,6 @@ def homepage(path):
         abort(404)
     return render_template('main.html', res = res, CONTENT = CONTENT, path = path)
 
-@app.route('/<string:p1>-<string:p2>/', defaults = {'path': ''})
-@app.route('/genre/<path:path>/<string:p1>-<string:p2>/')
-def sort_movies(path, p1, p2):
-    if path is '':
-        res = Movies.query.all()
-        return render_template('sorted_all.html', res = res, CONTENT = CONTENT, p1 = p1, p2 = p2)
-    elif path in CONTENT["Top genre"]:
-        genr = '%{0}%'.format(path)
-        res = Movies.query.filter(Movies.genre.ilike(genr))
-        return render_template('sorted_genre.html', res = res, CONTENT = CONTENT, p1 = p1, p2 = p2, path = path)
-    else:
-        abort(404)
-
-
-@app.route('/<path:path>/id/<object_id>/')
-def info(path, object_id):
-    try:
-        if path == 'movies':
-            res = Movies.query.filter_by(id = object_id).one()
-            actors = Actors.query.filter(Actors.movies.any(id = res.id)).all()
-
-            if 'logged_in' in session:
-
-                user = Users.query.filter_by(username = session['username']).one()
-                query = Movies.query.filter(Movies.users.any(id = user.id)).all()
-                if res not in query:
-                    btn = 'Add to Watchlist'
-                else:
-                    btn = 'Remove from Watchlist'
-
-            else: 
-
-                btn = 'Please sign in for this feature.'
-
-            return render_template('movies_info.html', res = res, CONTENT = CONTENT, actors = actors, btn = btn)
-
-        elif path == 'actors':
-            res = Actors.query.filter_by(id = object_id).one()
-            return render_template('actors_info.html', res = res, CONTENT = CONTENT)
-        else:
-            abort(404)
-    except Exception as e:
-        return str(e)
-
-@app.route('/search_result/', methods = ['POST'])
-def search():
-    try:
-        string = request.form['search']
-        search_str = '%{0}%'.format(string)
-        mov_res = Movies.query.filter(Movies.title.ilike(search_str))
-        act_res = Actors.query.filter(Actors.name.ilike(search_str))
-        return render_template('search_result.html', mov_res = mov_res, act_res = act_res, CONTENT = CONTENT)
-    except Exception as e:
-        return str(e)
-
-from models import Users
 
 @app.route('/register/', methods = ['GET', 'POST'])
 def register_page():
@@ -153,18 +115,58 @@ def login():
         flash("Invalid credentials, try again.")
         return redirect(url_for("homepage"))
 
-from functools import wraps
 
-def login_required(f):
-    @wraps(f)
-    def wrap(*args, **kwargs):
-        if 'logged_in' in session:
-            return f(*args, **kwargs)
-        else:
-            flash("You need to login first")
-            return redirect(url_for('homepage'))
+@app.route('/<string:p1>-<string:p2>/', defaults = {'path': ''})
+@app.route('/genre/<path:path>/<string:p1>-<string:p2>/')
+def sort_movies(path, p1, p2):
+    if path is '':
+        res = Movies.query.all()
+        return render_template('sorted_all.html', res = res, CONTENT = CONTENT, p1 = p1, p2 = p2)
+    elif path in CONTENT["Top genre"]:
+        genr = '%{0}%'.format(path)
+        res = Movies.query.filter(Movies.genre.ilike(genr))
+        return render_template('sorted_genre.html', res = res, CONTENT = CONTENT, p1 = p1, p2 = p2, path = path)
+    else:
+        abort(404)
 
-    return wrap
+
+@app.route('/<path:path>/id/<object_id>/')
+def info(path, object_id):
+	if path == 'movies':
+		res = Movies.query.filter_by(id = object_id).one()
+		actors = Actors.query.filter(Actors.movies.any(id = res.id)).all()
+
+		if 'logged_in' in session:
+
+			name = session['username']
+			watchlist = get_watchlist(name)
+			if res not in watchlist:
+				btn = 'Add to Watchlist'
+			else:
+				btn = 'Remove from Watchlist'
+
+		else: 
+
+			btn = 'Add to Watchlist'
+
+		return render_template('movies_info.html', res = res, CONTENT = CONTENT, actors = actors, btn = btn)
+
+	elif path == 'actors':
+		res = Actors.query.filter_by(id = object_id).one()
+		return render_template('actors_info.html', res = res, CONTENT = CONTENT)
+	else:
+		abort(404)
+
+@app.route('/search_result/', methods = ['POST'])
+def search():
+
+    string = request.form['search']
+    search_str = '%{0}%'.format(string)
+
+    mov_res = Movies.query.filter(Movies.title.ilike(search_str))
+    act_res = Actors.query.filter(Actors.name.ilike(search_str))
+
+    return render_template('search_result.html', mov_res = mov_res, act_res = act_res, CONTENT = CONTENT)
 
 @app.route('/logout/')
 @login_required
@@ -177,40 +179,31 @@ def logout():
 @app.route('/modify_watchlist/')
 @login_required
 def modify_watchlist():
-    try:
-        mid = request.args.get('movieid', 0, type=str)
-        user = Users.query.filter_by(username = session['username']).one()
-        movie = Movies.query.filter_by(id = mid).one()
-        query = Movies.query.filter(Movies.users.any(id = user.id)).all()
+    mid = request.args.get('movieid', 0, type=str)
+    movie = Movies.query.filter_by(id = mid).one()
 
-        if movie not in query:
-            movie.users.append(user)
-            db.session.commit()
-        else:
-            movie.users.remove(user)
-            db.session.commit()
+    name = session['username']
+    user = Users.query.filter_by(username = name).one()
 
-        gc.collect()
+    watchlist = get_watchlist(name)
 
-    except Exception as e:
+    if movie not in watchlist:
+        movie.users.append(user)
+        db.session.commit()
+    else:
+        movie.users.remove(user)
+        db.session.commit()
 
-        return str(e)
+    gc.collect()
 
-@app.route('/watchlist/<name>')
+@app.route('/watchlist/', defaults = {'name' : ''})
+@app.route('/watchlist/<name>/')
 @login_required
 def watchlist(name):
-    try:
 
-        name = session['username']
-        user = Users.query.filter_by(username = name).one()
+	watchlist = get_watchlist(name)
 
-        res = Movies.query.filter(Movies.users.any(id = user.id)).all()
-
-        return render_template('watchlist.html', res = res, CONTENT = CONTENT)
-
-    except Exception as e:
-
-        return str(e)
+	return render_template('watchlist.html', watchlist = watchlist, CONTENT = CONTENT, name = name)
 
 if __name__ == "__main__":
     app.run(debug = True)

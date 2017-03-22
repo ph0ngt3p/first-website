@@ -18,12 +18,15 @@
 		            	url: '{{ url_for('modify_watchlist') }}', 
 		            	data: { movieid: {{ res.id }} } 
 		            });
-					return false;
+					   return false;
 		        });
 		    });
-		function changeText(){
+		  function changeText(){
 	        $('#watchlistbutton').val($('#watchlistbutton').val() == 'Add to Watchlist' ? 'Remove from Watchlist' : 'Add to Watchlist');
 	    }
+      function credentialRequired(){
+          $('#loginrequired').text('You need to login first')
+      }
 	</script>
 </head>
 
@@ -40,7 +43,9 @@
               {% if session.logged_in %}
               <input id="watchlistbutton" type="button" name="add" value="{{ btn }}" onclick="changeText()">
               {% else %}
-              <a href="{{ url_for('register_page') }}"><input type="button" name="add" value="{{ btn }}"></a>
+              <input id="guestbutton" type="button" name="add" value="{{ btn }}" onclick="credentialRequired()">
+              <br>
+              <p id=loginrequired></p>
               {% endif %}
           </div>
           <div class="col-md-5">

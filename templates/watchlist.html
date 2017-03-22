@@ -9,7 +9,7 @@
 {% block body %}
 <body>
 
-	<h2>{{ session['username'] }}'s Watchlist:</h2>
+	<h2>{{ name }}'s Watchlist:</h2>
 	<br>
 	<br>
 
@@ -17,7 +17,7 @@
 
 		<tbody>
 			<th></th><th>Title</th><th>Rating</th>
-			{% for movie in res %}
+			{% for movie in watchlist %}
 				<tr>
 				<td><a href= "{{ url_for('info', path = 'movies', object_id = movie.id) }}"><img src="{{ movie.poster }}"/></a></td>
 				<td><a href= "{{ url_for('info', path = 'movies', object_id = movie.id) }}">{{ movie.title }} ({{ movie.year }})</a></td>
