@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for, flash, redirect, session, abort, jsonify
+from flask import Flask, render_template, request, url_for, flash, redirect, session, abort
 from models import db
 from content_management import Content
 from db_connection import dbconn
