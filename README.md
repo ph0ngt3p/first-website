@@ -14,7 +14,7 @@ Ubuntu documentation:
 * 0.0.1
     * Work in progress
 
-## Meta
+## Author
 
 Tuan Dzung – zun1903@gmail.com
 
