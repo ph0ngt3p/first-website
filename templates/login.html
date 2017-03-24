@@ -1,40 +1,11 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title>Bootstrap Case</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css"/>
-  <link href="/CSS/jquery.bxslider.css" rel="stylesheet" />
-  <link href="css/scrolling-nav.css" rel="stylesheet">
-  <script src="js/jquery.easing.min.js"></script>
-  <script src="js/scrolling-nav.js"></script>
-  <script src="js/jquery.js"></script>
-  <script src="js/bootstrap.js"></script>
+{% extends "header.html" %}
+{% block head %}
   <style>
-  img {
-  	width:250px;
-    height:390px;
-  }
-
-  .none-bullet {
-    list-style-type: none;
-  }
-  .inline-display{
-      display: inline-block;
-  }
-
-  .center-image {
-    display: block;
-    margin: auto;
-  }
-
   #login .input-group {
   position: relative;
   margin: 40px 0 20px;
   }
-
+  
   #login input {
   font-size: 18px;
   padding: 10px 10px 10px 5px;
@@ -44,7 +15,7 @@
   width:400px;
   max-width: 100%;
   }
-
+  
   #login textarea {
   font-size: 18px;
   padding: 10px 10px 10px 5px;
@@ -54,15 +25,15 @@
   width:400px;
   max-width: 100%;
   }
-
+  
   #login input:focus {
   outline: none;
   }
-
+  
   #login textarea:focus {
   outline: none;
   }
-
+  
   #login label {
   color: #8c8c8c;
   font-size: 18px;
@@ -76,7 +47,7 @@
   -moz-transition: 0.2s ease all;
   -webkit-transition: 0.2s ease all;
   }
-
+  
   #login input:focus ~ label,
   #login input:valid ~ label {
   top: -20px;
@@ -84,7 +55,7 @@
   color: #8c8c8c;
   font-family: Bree Serif;
   }
-
+  
   #login textarea:focus ~ label,
   #login textarea:valid ~ label {
   top: -20px;
@@ -92,7 +63,7 @@
   font-family: Bree Serif;
   color: #8c8c8c;
   }
-
+  
   #login .bar {
   position: relative;
   display:block;
@@ -100,7 +71,7 @@
   width: 100%;
   height: auto;
   }
-
+  
   #login .bar:before,
   #login .bar:after {
   content: '';
@@ -113,145 +84,103 @@
   -moz-transition: 0.2s ease all;
   -webkit-transition: 0.2s ease all;
   }
-
+  
   #login .bar:before {
   left: 50%;
   }
-
+  
   #login .bar:after {
   right: 50%;
   }
-
-    input:focus ~ .bar:before,
-    input:focus ~ .bar:after {
-    width: 50%;
-    }
-
-    textarea:focus ~ .bar:before,
-    textarea:focus ~ .bar:after {
-    width: 50%;
-    }
-
+  
+  input:focus ~ .bar:before,
+  input:focus ~ .bar:after {
+  width: 50%;
+  }
+  
+  textarea:focus ~ .bar:before,
+  textarea:focus ~ .bar:after {
+  width: 50%;
+  }
+  
   #login .highlight {
-    position: absolute;
-    height: 60%;
-    width: 100px;
-    top: 25%;
-    left: 0;
-    pointer-events: none;
-    opacity: 0.5;
-    }
-
+  position: absolute;
+  height: 60%;
+  width: 100px;
+  top: 25%;
+  left: 0;
+  pointer-events: none;
+  opacity: 0.5;
+  }
+  
   #login  input:focus ~ .highlight {
-      -webkit-animation: inputHighlighter 0.3s ease;
-      -moz-animation: inputHighlighter 0.3s ease;
-      animation: inputHighlighter 0.3s ease;
-    }
-
+  -webkit-animation: inputHighlighter 0.3s ease;
+  -moz-animation: inputHighlighter 0.3s ease;
+  animation: inputHighlighter 0.3s ease;
+  }
+  
   #login  textarea:focus ~ .highlight {
-      -webkit-animation: inputHighlighter 0.3s ease;
-      -moz-animation: inputHighlighter 0.3s ease;
-      animation: inputHighlighter 0.3s ease;
-    }
+  -webkit-animation: inputHighlighter 0.3s ease;
+  -moz-animation: inputHighlighter 0.3s ease;
+  animation: inputHighlighter 0.3s ease;
+  }
   /* animations */
-    @-webkit-keyframes inputHighlighter {
-      from { background: #d9d9d9; }
-      to   { width: 0; background: transparent; }
-    }
-    @-moz-keyframes inputHighlighter {
-      from { background: #d9d9d9; }
-      to   { width: 0; background: transparent; }
-    }
-    @keyframes inputHighlighter {
-      from { background: #d9d9d9; }
-      to   { width: 0; background: transparent; }
-    }
-
-
+  @-webkit-keyframes inputHighlighter {
+  from { background: #d9d9d9; }
+  to   { width: 0; background: transparent; }
+  }
+  @-moz-keyframes inputHighlighter {
+  from { background: #d9d9d9; }
+  to   { width: 0; background: transparent; }
+  }
+  @keyframes inputHighlighter {
+  from { background: #d9d9d9; }
+  to   { width: 0; background: transparent; }
+  }
   </style>
-</head>
-<body>
-  </script>
-<nav class="navbar navbar-inverse">
-  <div class="container-fluid">
-    <div class="navbar-header">
-      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-        <span class="icon-bar"></span>
-        <span class="icon-bar"></span>
-      </button>
-      <a class="navbar-brand" href="#">WebSiteName</a>
-    </div>
-    <div class="collapse navbar-collapse" id="myNavbar">
-      <ul class="nav navbar-nav">
-        <li class="active"><a href="#">Home</a></li>
-        <li class="dropdown">
-          <a class="dropdown-toggle" data-toggle="dropdown" href="#">Top movies by genre <span class="caret"></span></a>
-          <ul class="dropdown-menu">
-            <li><a href="#">Action</a></li>
-            <li><a href="#">Adventure</a></li>
-            <li><a href="#">Animation</a></li>
-            <li><a href="#">Comedy</a></li>
-            <li><a href="#">Crime</a></li>
-          </ul>
-        </li>
-        <li><a href="#">My watchlist</a></li>
-      </ul>
-      <form class="navbar-form navbar-left">
-      <div class="input-group" style="padding:0px">
-        <input type="text" class="form-control" placeholder="Search" required="">
-        <div class="input-group-btn">
-          <button class="btn btn-default" type="submit">
-            <i class="glyphicon glyphicon-search"></i>
-          </button>
-        </div>
-      </div>
-    </form>
-      <ul class="nav navbar-nav navbar-right">
-        <li><a href="#"><span class="glyphicon glyphicon-user"></span> Sign Up</a></li>
-        <li><a href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
-      </ul>
-    </div>
-  </div>
-</nav>
-<!-- Login -->
-<section class="about-section" style="height:100%;padding-top:100px" id="login">
-    <div class="container">
-      <div class="row">
-        <div class="col-lg-6 col-lg-offset-3">
-          <div class="well">
-            <center>
+{% endblock %}
+{% block img %}
+  width:250px;
+  height:390px;
+{% endblock %}
+{% block body %}
+  <body>
+    <!-- Login -->
+    <section class="about-section" style="height:100%;padding-top:100px" id="login">
+      <div class="container">
+        <div class="row">
+          <div class="col-lg-6 col-lg-offset-3">
+            <div class="well">
+              <center>
               <h2>Login</h2>
               <br/>
               <!-- Avatar -->
               <img class="img-responsive img-circle center-image"  src="http://trenchlessleakdetection.com/wp-content/themes/trenchless-leak-detection/images/unknown-speaker.gif" alt="user-avatar">
-              <form style=" display: block;
-              margin: auto;">
-              <!-- User name -->
+              <form action="" style="display: block; margin: auto;" method="POST">
+                <!-- User name -->
                 <div class="input-group">
-                  <input type="text" required="">
+                  <input type="text" name="username" value="{{ request.form.username }}">
                   <span class="highlight"></span>
                   <span class="bar"></span>
                   <label><i class="fa fa-user" aria-hidden="true" style="color:#8c8c8c"></i>  Username</label>
                 </div>
                 <!-- Password -->
                 <div class="input-group">
-                  <input type="password" required="">
+                  <input type="password" name="password" value="{{ request.form.password }}">
                   <span class="highlight"></span>
                   <span class="bar"></span>
                   <label ><i class="fa fa-key" aria-hidden="true" style="color:#8c8c8c"></i> Password</label>
                 </div>
                 <!-- Button -->
                 <div class="input-group">
-                <button type="submit" class="btn" style="center:100px" type="background-color:#d9d9d9"><i class="fa fa-sign-in" aria-hidden="true"></i><span style="font-family:Bree Serif"> Login</span></button>
-              </div>
+                  <button type="submit" class="btn" style="center:100px" type="background-color:#d9d9d9"><i class="fa fa-sign-in" aria-hidden="true"></i><span style="font-family:Bree Serif"> Login</span></button>
+                </div>
               </form>
-            </center>
+              </center>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-
-</section>
-
-</body>
-</html>
+    </section>
+  </body>
+{% endblock %}

@@ -11,6 +11,10 @@ CONTENT = Content()
 
 app = Flask(__name__)
 
+app.secret_key = 's1$%)221ddafcvx(":8jk1dc?!!'
+
+app.config['SESSION_TYPE'] = 'filesystem'
+
 POSTGRES = dbconn()
 
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
@@ -27,7 +31,7 @@ def login_required(f):
             return f(*args, **kwargs)
         else:
             flash("You need to login first")
-            return redirect(url_for('movie_list'))
+            return redirect(url_for('login_page'))
 
     return wrap
 
@@ -38,7 +42,7 @@ def get_watchlist(name):
 
 
 @app.route('/', defaults = {'path': '', 'query_type' : ''})
-@app.route('/<query_type>/<path:path>/')
+@app.route('/<query_type>/<path:path>')
 def movie_list(query_type, path):
     if query_type is '' and path is '':
         res = Movies.query.all()
@@ -52,46 +56,43 @@ def movie_list(query_type, path):
     return render_template('main.html', res = res, CONTENT = CONTENT, path = path, query_type = query_type)
 
 
-@app.route('/register/', methods = ['GET', 'POST'])
+@app.route('/register', methods = ['GET', 'POST'])
 def register_page():
-    try:
-        form = RegistrationForm(request.form)
 
-        if request.method == "POST" and form.validate():
-            username  = form.username.data
-            email = form.email.data
-            password = sha256_crypt.encrypt((str(form.password.data)))
+    form = RegistrationForm(request.form)
 
-            x = Users.query.filter_by(username = username).count()
-            y = Users.query.filter_by(email = email).count()
+    if request.method == "POST" and form.validate():
+        username  = form.username.data
+        email = form.email.data
+        password = sha256_crypt.encrypt((str(form.password.data)))
 
-            if x > 0:
-                flash("That username is already taken, please choose another")
-                return render_template('register.html', form=form, CONTENT = CONTENT)
+        x = Users.query.filter_by(username = username).count()
+        y = Users.query.filter_by(email = email).count()
 
-            elif y > 0:
-                flash("That email is already used, please choose another")
-                return render_template('register.html', form=form, CONTENT = CONTENT)
+        if x > 0:
+            flash("That username is already taken, please choose another")
+            return render_template('register.html', form=form, CONTENT = CONTENT)
 
-            else:
+        elif y > 0:
+            flash("That email is already used, please choose another")
+            return render_template('register.html', form=form, CONTENT = CONTENT)
 
-                db.session.add(Users(username, password, email))
-                db.session.commit()
-                flash("Thanks for registering!")
-                gc.collect()
+        else:
 
-                session['logged_in'] = True
-                session['username'] = username
+            db.session.add(Users(username = username, password = password, email = email))
+            db.session.commit()
+            flash("Thanks for registering!")
+            gc.collect()
 
-                return redirect(url_for('movie_list'))
+            session['logged_in'] = True
+            session['username'] = username
 
-        return render_template("register.html", form=form, CONTENT = CONTENT)
+            return redirect(url_for('movie_list'))
 
-    except Exception as e:
-        return(str(e))
+    return render_template("register.html", form = form, CONTENT = CONTENT)
 
-@app.route('/login/', methods = ['GET', 'POST'])
-def login():
+@app.route('/login', methods = ['GET', 'POST'])
+def login_page():
     error = ''
     try:
         if request.method == "POST":
@@ -103,6 +104,7 @@ def login():
                 session['username'] = request.form['username']
                 whalecum = 'Welcome back {0}!'.format(request.form['username'])
                 flash(whalecum)
+                return redirect(url_for("movie_list"))
 
             else:
                 error = "Invalid credentials, try again."
@@ -110,15 +112,16 @@ def login():
 
         gc.collect()
 
-        return redirect(url_for("movie_list"))
+        return render_template("login.html", error = error, CONTENT = CONTENT)
 
     except Exception as e:
+        error = "Invalid credentials, try again."
         # flash(str(e))
-        flash("Invalid credentials, try again.")
-        return redirect(url_for("movie_list"))
+        flash(error)
+        return redirect(url_for("login_page"))
 
 
-@app.route('/<path:path>/id/<object_id>/')
+@app.route('/<path:path>/id/<object_id>')
 def info(path, object_id):
 	if path == 'movies':
 		res = Movies.query.filter_by(id = object_id).one()
@@ -145,7 +148,7 @@ def info(path, object_id):
 	else:
 		abort(404)
 
-@app.route('/search_result/', methods = ['POST'])
+@app.route('/search_result', methods = ['POST'])
 def search():
 
     string = request.form['search']
@@ -156,15 +159,15 @@ def search():
 
     return render_template('search_result.html', mov_res = mov_res, act_res = act_res, CONTENT = CONTENT)
 
-@app.route('/logout/')
+@app.route('/logout')
 @login_required
 def logout():
     session.clear()
     flash("You have been logged out!")
     gc.collect()
-    return redirect(url_for('movie_list'))
+    return redirect(url_for('login_page'))
 
-@app.route('/modify_watchlist/')
+@app.route('/modify_watchlist')
 @login_required
 def modify_watchlist():
     mid = request.args.get('movieid', 0, type=str)
@@ -185,7 +188,7 @@ def modify_watchlist():
     gc.collect()
 
 @app.route('/watchlist/', defaults = {'name' : ''})
-@app.route('/watchlist/<name>/')
+@app.route('/watchlist/<name>')
 @login_required
 def watchlist(name):
 

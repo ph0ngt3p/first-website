@@ -14,8 +14,9 @@
 	<link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.13/css/dataTables.bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.5.0/css/font-awesome.min.css">
 
+	<script type="text/javascript" src="{{ url_for('static', filename = 'js/bootstrap.js') }}"></script>
 	<script type="text/javascript" src="{{ url_for('static', filename = 'js/jquery-comments.js') }}"></script>
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-easing/1.4.1/jquery.easing.min.js"></script>
 	<script type="text/javascript" src="//code.jquery.com/jquery-1.12.4.js"></script>
 	<script type="text/javascript" src="//cdn.datatables.net/1.10.13/js/jquery.dataTables.min.js"></script>
 	<script type="text/javascript" src="https://cdn.datatables.net/1.10.13/js/dataTables.bootstrap.min.js"></script>
@@ -26,10 +27,11 @@
 		    $('#movietable').DataTable();
 		}); 
 	</script>
-
+	
+	{% block head %}{% endblock %}
 	<style>
-	  img {
-		{% block head %}{% endblock %}
+	  img{
+	  	{% block img %}{% endblock %}
 	  }
 
 	  th:hover { background: #acc8dd; }
@@ -68,8 +70,6 @@
 	    -o-box-sizing: content-box;
 	    box-sizing: content-box;
 	    }
-
-
 
 	</style>
 </head>
@@ -111,37 +111,10 @@
 
 	    	{% if session.logged_in %}
 	    		<div class="navbar-text navbar-left"><li>Logged in as {{ session.username }}</li></div>
-	    		<li><a href="/logout/"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
+	    		<li><a href="{{ url_for('logout') }}"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
 	    	{% else %}
 	    		<div class="navbar-text navbar-left"><li>Welcome guest !</li></div>
-				<li><a role="presentation" data-toggle="modal" data-target="#exampleModal" href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
-				<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-				  <div class="modal-dialog">
-					<div class="modal-content">
-					  <div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-						<h4 class="modal-title" id="exampleModalLabel">Login</h4>
-					  </div>
-					  <div class="modal-body">
-						  <div class="container-fluid">
-							  <form action="/login/" class="form-inline" method="POST">
-								<input type="text" class="form-control" placeholder="Username" name="username" value="{{ request.form.username }}">
-								 <input type="password" class="form-control" placeholder="Password" name="password" value="{{ request.form.password }}">
-								<input class="btn btn-primary" type="submit" value="Login">
-							  </form>
-							  
-								<div class="container">
-								<br>
-							   <p>No account? <a href="{{ url_for('register_page') }}">Register here</a>.</p>
-							   <br>
-								
-							  </div>
-						</div>
-					  </div>
-
-					</div>
-				  </div>
-				</div>
+				<li><a href="{{ url_for('login_page') }}"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
 			{% endif %}
 	</ul>
 	    </div>

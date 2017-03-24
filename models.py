@@ -1,7 +1,6 @@
 # coding: utf-8
 from sqlalchemy import Column, ForeignKey, Integer, String, Table, text
 from sqlalchemy.orm import relationship
-from sqlalchemy.ext.declarative import declarative_base
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
@@ -33,21 +32,11 @@ class Actors(db.Model):
 
     movies = db.relationship(u'Movies', secondary='actors_by_movies')
 
-    def __init__(self, aka, biography, birthday, deathday, gender, homepage, tmdbid, imdbid, name, place_of_birth, profile_pic):
-        self.aka = aka
-        self.biography = biography
-        self.birthday = birthday
-        self.deathday = deathday
-        self.gender = gender
-        self.homepage = homepage
-        self.tmdbid = tmdbid
-        self.imdbid = imdbid
-        self.name = name
-        self.place_of_birth = place_of_birth
-        self.profile_pic = profile_pic
+    def __init__(self, *args, **kwargs):
+        super(Actors, self).__init__(*args, **kwargs)
 
     def __repr__(self):
-        return '<Actor %r>' % self.name
+        return '<Actors %r>' % self.name
 
 
 class Movies(db.Model):
@@ -75,35 +64,27 @@ class Movies(db.Model):
 
     users = db.relationship(u'Users', secondary='users_watchlist')
 
-    def __init__(self, title, year, rated, released, runtime, genre, director, writer, casts, plot, votes, poster):
-        self.title = title
-        self.year = year
-        self.rated = rated
-        self.released = released
-        self.runtime = runtime
-        self.genre = genre
-        self.director = director
-        self.writer = writer
-        self.casts = casts
-        self.plot = plot
-        self.poster = poster
+    def __init__(self, *args, **kwargs):
+        super(Movies, self).__init__(*args, **kwargs)
 
     def __repr__(self):
-        return '<Movie %r>' % self.Title
+        return '<Movies %r>' % self.title
+
 
 class Users(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(Integer, primary_key=True, server_default=text("nextval('users_id_seq'::regclass)"))
-    username = db.Column(String(20), unique=True, server_default=text("NULL::character varying"))
-    password = db.Column(String(100), server_default=text("NULL::character varying"))
-    email = db.Column(String(50), unique=True, server_default=text("NULL::character varying"))
-    settings = db.Column(String(32000), server_default=text("NULL::character varying"))
+    username = db.Column(String(20), nullable=False, unique=True)
+    password = db.Column(String(100), nullable=False)
+    email = db.Column(String(50), nullable=False, unique=True)
+    profile_pic = db.Column(String(1000), server_default=text("NULL::character varying"))
+    fname = db.Column(String(20), server_default=text("NULL::character varying"))
+    lname = db.Column(String(20), server_default=text("NULL::character varying"))
+    age = db.Column(Integer)
 
-    def __init__(self, username, password, email):
-        self.username = username
-        self.password = password
-        self.email = email
+    def __init__(self, *args, **kwargs):
+        super(Users, self).__init__(*args, **kwargs)
 
     def __repr__(self):
         return '<User %r>' % self.username
