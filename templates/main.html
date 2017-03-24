@@ -1,203 +1,14 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <title>Movie Database</title>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
-  <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+{% extends "header.html" %}
 
-  <link href="{{ url_for('static', filename = 'css/jquery.bxslider.css') }}" rel="stylesheet" />
-  <link href="{{ url_for('static', filename = 'css/scrolling-nav.css') }}" rel="stylesheet">
-  <script src="{{ url_for('static', filename = 'js/jquery.easing.min.js') }}"></script>
-  <script src="{{ url_for('static', filename = 'js/scrolling-nav.js') }}"></script>
-  <script src="//code.jquery.com/jquery-1.12.4.js"></script>
-  <script type="text/javascript" src="{{ url_for('static', filename = 'js/jquery.tablesorter.js') }}"></script> 
+{% block head %}
+	width: 100px;
+	height: 135px;
+{% endblock %}
 
-  	<script type="text/javascript">
-	$(document).ready(function() 
-	    { 
-	        $("#movietable").tablesorter(); 
-	    } 
-	); 
-	</script>
-
-  <style>
-  img {
-  	width:64px;
-    height:86px;
-  }
-
-	#movietable {
-	  margin: 0 auto;
-	  font-size: 1.2em;
-	  margin-bottom: 15px;
-	}
-
-
-	#movietable thead {
-	  cursor: pointer;
-	  background: #c9dff0;
-	}
-	#movietable thead tr th { 
-	  font-weight: bold;
-	  padding: 12px 30px;
-	  padding-left: 42px;
-	}
-	#movietable thead tr th span { 
-	  padding-right: 20px;
-	  background-repeat: no-repeat;
-	  background-position: 100% 100%;
-	}
-
-	#movietable thead tr th.headerSortUp, #movietable thead tr th.headerSortDown {
-	  background: #acc8dd;
-	}
-
-	#movietable thead tr th.headerSortUp span {
-	  	background-image: url('http://i.imgur.com/RkA9MBo.png');
-	}
-	#movietable thead tr th.headerSortDown span {
-		background-image: url('http://i.imgur.com/SP99ZPJ.png');
-	}
-
-
-	#movietable tbody tr { 
-	  color: #555;
-	}
-	#movietable tbody tr td {
-	  text-align: center;
-	  padding: 15px 10px;
-	}
-	#movietable tbody tr td.lalign {
-	  text-align: left;
-	}
-
-  .none-bullet {
-    list-style-type: none;
-  }
-  .inline-display{
-      display: inline-block;
-  }
-
-  .center-image {
-    display: block;
-    margin: auto;
-  }
-  .hr1 {
-    font-family: Arial, sans-serif; /* choose the font you like */
-    text-align: center; /* horizontal centering */
-    line-height: 1px; /* vertical centering */
-    height: 1px; /* gap between the lines */
-    font-size: 1em; /* choose font size you like */
-    border-width: 1px 0; /* top and bottom borders */
-    border-style: solid;
-    border-color: #676767;
-    margin: 20px 10px; /* 20px space above/below, 10px left/right */
-
-    /* ensure 1px gap between borders */
-    -webkit-box-sizing: content-box;
-    -moz-box-sizing: content-box;
-    -ms-box-sizing: content-box;
-    -o-box-sizing: content-box;
-    box-sizing: content-box;
-    }
-
-
-
-  </style>
-</head>
-
-<header>
-	<nav class="navbar navbar-inverse">
-	  <div class="container-fluid">
-	    <div class="navbar-header">
-	      <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#myNavbar">
-	        <span class="icon-bar"></span>
-	        <span class="icon-bar"></span>                       
-	      </button>
-	      <a class="navbar-brand" href="{{'/'}}">Movie Database</a>
-	    </div>
-	    <div class="collapse navbar-collapse" id="myNavbar">
-	      <ul class="nav navbar-nav">
-	        <li class="dropdown">
-	          <a class="dropdown-toggle" data-toggle="dropdown" href="#">Top movies by genre <span class="caret"></span></a>
-	          <ul class="dropdown-menu">
-	            {% for t in CONTENT["Top genre"] %}
-	     			<li><a href="{{url_for('movie_list', path = t)}}">{{t}}</a></li>
-	   			{% endfor %}
-	          </ul>
-	        </li>
-	        <li><a href="{{ url_for('watchlist', name = session['username']) }}">My watchlist</a></li>
-	      </ul>
-	      <form class="navbar-form navbar-right" action="/search_result/" method="POST">
-	      <div class="input-group">
-		        <input type="text" class="form-control" name="search" placeholder="Search" value="{{request.form.search}}"/>
-		        <div class="input-group-btn">
-		          <button class="btn btn-default" type="submit">
-		            <i class="glyphicon glyphicon-search"></i>
-	          		</button>
-	        	</div>
-	    </div>
-	    </form>
-	      <ul class="nav navbar-nav navbar-right">
-			{% if session.logged_in %}
-			<div style="margin-right: 10px; margin-left: 15px; margin-top: 15px; margin-bottom: 5px;" class="navbar-text navbar-left"><li>Logged in as {{ session.username }}</li></div>
-	    		<li><a href="/logout/"><span class="glyphicon glyphicon-log-out"></span> Logout</a></li>
-	    	{% else %}
-	    		<div style="margin-right: 10px; margin-left: 15px; margin-top: 15px; margin-bottom: 5px;" class="navbar-text navbar-left"><li>Welcome guest !</li></div>
-				<li><a role="presentation" data-toggle="modal" data-target="#exampleModal" href="#"><span class="glyphicon glyphicon-log-in"></span> Login</a></li>
-				<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-				  <div class="modal-dialog">
-					<div class="modal-content">
-					  <div class="modal-header">
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-						<h4 class="modal-title" id="exampleModalLabel">Login</h4>
-					  </div>
-					  <div class="modal-body">
-						  <div class="container-fluid">
-							  <form action="/login/" class="form-inline" method="POST">
-								<input type="text" class="form-control" placeholder="Username" name="username" value="{{ request.form.username }}">
-								 <input type="password" class="form-control" placeholder="Password" name="password" value="{{ request.form.password }}">
-								<input class="btn btn-primary" type="submit" value="Login">
-							  </form>
-							  
-								<div class="container">
-								<br>
-							   <p>No account? <a href="{{ url_for('register_page') }}">Register here</a>.</p>
-							   <br>
-								
-							  </div>
-						</div>
-					  </div>
-
-					</div>
-				  </div>
-				</div>
-			{% endif %}
-			
-	      </ul>
-	    </div>
-	  </div>
-	</nav>
-	
-</header>
-
+{% block body %}
 
 <body>
-	<div class="container" style="min-height:100% width:80%">
-	{% with messages = get_flashed_messages() %}
-	  {% if messages %}
-	    {% for message in messages %}
-		  <div class="alert alert-warning alert-dismissible" role="alert">
-		  <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">×</span></button>
-			{{message}}
-		  </div>
-		{% endfor %}
-	  {% endif %}
-	{% endwith %}
-
-	<table id="movietable" class="table table-hover">
+	<table id="movietable" class="table table-hover" cellspacing="0" cellpadding="0">
 		<thead>
 			<tr><th></th><th><span>Title</span></th><th><span>Year</span></th><th><span>Rating</span></th></tr>
 		</thead>
@@ -206,46 +17,13 @@
 			{% for movie in res %}
 				<tr>
 				<td><a href= "{{ url_for('info', path = 'movies', object_id = movie.id) }}"><img src="{{ movie.poster }}"/></a></td>
-				<td><a href= "{{ url_for('info', path = 'movies', object_id = movie.id) }}">{{ movie.title }}</a></td>
+				<td class="lalign"><a href= "{{ url_for('info', path = 'movies', object_id = movie.id) }}">{{ movie.title }}</a></td>
 				<td>{{ movie.year }}</td>
 				<td>{{ movie.rating }}</td>
 				</tr>
 			{% endfor %}
 		</tbody>
 	</table>
-	</div>
-	<script type="text/javascript" src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
 </body>
-</html>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+{% endblock %}

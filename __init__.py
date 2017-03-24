@@ -37,17 +37,19 @@ def get_watchlist(name):
 	return Movies.query.filter(Movies.users.any(id = user.id)).all()
 
 
-@app.route('/', defaults = {'path': ''})
-@app.route('/genre/<path:path>/')
-def movie_list(path):
-    if path is '':
+@app.route('/', defaults = {'path': '', 'query_type' : ''})
+@app.route('/<query_type>/<path:path>/')
+def movie_list(query_type, path):
+    if query_type is '' and path is '':
         res = Movies.query.all()
-    elif path in CONTENT["Top genre"]:
+    elif query_type == 'genre' and path in CONTENT["Top genre"]:
         genr = '%{0}%'.format(path)
         res = Movies.query.filter(Movies.genre.ilike(genr)).order_by(Movies.rating.desc())
+    elif query_type == 'year':
+    	res = Movies.query.filter(Movies.year.ilike(path)).order_by(Movies.rating.desc())
     else:
         abort(404)
-    return render_template('main.html', res = res, CONTENT = CONTENT, path = path)
+    return render_template('main.html', res = res, CONTENT = CONTENT, path = path, query_type = query_type)
 
 
 @app.route('/register/', methods = ['GET', 'POST'])

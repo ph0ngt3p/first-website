@@ -11,6 +11,9 @@ Ubuntu documentation:
 
 ## Release History
 
+* 0.1.0
+    * Added more JQuery functions
+
 * 0.0.1
     * Work in progress
 

@@ -1,15 +1,16 @@
 {% extends "header.html" %}
 
 {% block head %}
-  		width:64px;
-    	height:86px;
+  	width:100px;
+    height:135px;
 {% endblock %}
 
 
 {% block body %}
+
 <body>
 
-	<h2>{{ name }}'s Watchlist:</h2>
+	<h1>{{ name }}'s Watchlist:</h1>
 	<br>
 	<br>
 
@@ -23,7 +24,7 @@
 			{% for movie in watchlist %}
 				<tr>
 				<td><a href= "{{ url_for('info', path = 'movies', object_id = movie.id) }}"><img src="{{ movie.poster }}"/></a></td>
-				<td><a href= "{{ url_for('info', path = 'movies', object_id = movie.id) }}">{{ movie.title }}</a></td>
+				<td class="lalign"><a href= "{{ url_for('info', path = 'movies', object_id = movie.id) }}">{{ movie.title }}</a></td>
 				<td>{{ movie.year }}</td>
 				<td>{{ movie.rating }}</td>
 				</tr>
