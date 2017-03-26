@@ -30,8 +30,6 @@ class Actors(db.Model):
     place_of_birth = db.Column(String(250), server_default=text("NULL::character varying"))
     profile_pic = db.Column(String(500), server_default=text("NULL::character varying"))
 
-    movies = db.relationship(u'Movies', secondary='actors_by_movies')
-
     def __init__(self, *args, **kwargs):
         super(Actors, self).__init__(*args, **kwargs)
 
@@ -62,7 +60,7 @@ class Movies(db.Model):
     imdbid = db.Column(String(128), nullable=False, unique=True)
     kind = db.Column(String(128), server_default=text("NULL::character varying"))
 
-    users = db.relationship(u'Users', secondary='users_watchlist')
+    actors = db.relationship(u'Actors', secondary='actors_by_movies')
 
     def __init__(self, *args, **kwargs):
         super(Movies, self).__init__(*args, **kwargs)
@@ -83,6 +81,8 @@ class Users(db.Model):
     lname = db.Column(String(20), server_default=text("NULL::character varying"))
     age = db.Column(Integer)
 
+    movies = db.relationship(u'Movies', secondary='users_watchlist')
+
     def __init__(self, *args, **kwargs):
         super(Users, self).__init__(*args, **kwargs)
 
@@ -94,4 +94,3 @@ t_users_watchlist = db.Table(
     db.Column('user_id', ForeignKey(u'users.id'), primary_key=True, nullable=False),
     db.Column('movie_id', ForeignKey(u'movies_info.id'), primary_key=True, nullable=False)
 )
-

@@ -1,7 +1,7 @@
-from flask import Flask, render_template, request, url_for, flash, redirect, session, abort
+from flask import render_template, request, url_for, flash, redirect, session, abort
+from application import app
 from models import db
 from content_management import Content
-from db_connection import dbconn
 from reg_form import RegistrationForm
 from passlib.hash import sha256_crypt
 from functools import wraps
@@ -9,19 +9,13 @@ import gc
 
 CONTENT = Content()
 
-app = Flask(__name__)
-
-app.secret_key = 's1$%)221ddafcvx(":8jk1dc?!!'
-
-app.config['SESSION_TYPE'] = 'filesystem'
-
-POSTGRES = dbconn()
-
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://%(user)s:%(pw)s@%(host)s:%(port)s/%(db)s' % POSTGRES
-
 db.init_app(app)
 
 from models import Actors, Movies, Users
+from blueprint import movies_blueprint, actors_blueprint, users_blueprint
+app.register_blueprint(movies_blueprint)
+app.register_blueprint(actors_blueprint)
+app.register_blueprint(users_blueprint)
 
 
 def login_required(f):
@@ -38,11 +32,11 @@ def login_required(f):
 
 def get_watchlist(name):
 	user = Users.query.filter_by(username = name).one()
-	return Movies.query.filter(Movies.users.any(id = user.id)).all()
+	return user.movies
 
 
-@app.route('/', defaults = {'path': '', 'query_type' : ''})
-@app.route('/<query_type>/<path:path>')
+@app.route('/', defaults = {'path': '', 'query_type' : ''}) 
+@app.route('/<query_type>/<path:path>/')
 def movie_list(query_type, path):
     if query_type is '' and path is '':
         res = Movies.query.all()
@@ -125,7 +119,7 @@ def login_page():
 def info(path, object_id):
 	if path == 'movies':
 		res = Movies.query.filter_by(id = object_id).one()
-		actors = Actors.query.filter(Actors.movies.any(id = res.id)).all()
+		actors = res.actors
 
 		if 'logged_in' in session:
 
@@ -179,10 +173,10 @@ def modify_watchlist():
     watchlist = get_watchlist(name)
 
     if movie not in watchlist:
-        movie.users.append(user)
+        user.movies.append(movie)
         db.session.commit()
     else:
-        movie.users.remove(user)
+        user.movies.remove(movie)
         db.session.commit()
 
     gc.collect()
