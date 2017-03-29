@@ -144,7 +144,7 @@ def info(path, object_id):
 	else:
 		abort(404)
 
-@app.route('/search_result', methods = ['POST'])
+@app.route('/search_result/', methods = ['POST'])
 def search():
 
     string = request.form['search']
