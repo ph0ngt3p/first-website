@@ -2,9 +2,12 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Table, text
 from sqlalchemy.orm import relationship
 from flask_sqlalchemy import SQLAlchemy
+from marshmallow import validate
+from flask_marshmallow import Marshmallow
+from application import app
 
-db = SQLAlchemy()
-
+db = SQLAlchemy(app)
+ma = Marshmallow(app)
 metadata = db.metadata
 
 t_actors_by_movies = db.Table(
@@ -13,8 +16,20 @@ t_actors_by_movies = db.Table(
     db.Column('actor_id', ForeignKey(u'actors_info.id'), primary_key=True, nullable=False)
 )
 
+class CRUD():   
+ 
+    def add(self, resource):
+        db.session.add(resource)
+        return db.session.commit()   
+ 
+    def update(self):
+        return db.session.commit()
+ 
+    def delete(self, resource):
+        db.session.delete(resource)
+        return db.session.commit()
 
-class Actors(db.Model):
+class Actors(db.Model, CRUD):
     __tablename__ = 'actors_info'
 
     id = db.Column(Integer, primary_key=True, server_default=text("nextval('actors_info_id_seq'::regclass)"))
@@ -22,12 +37,13 @@ class Actors(db.Model):
     biography = db.Column(String(5000), server_default=text("NULL::character varying"))
     birthday = db.Column(String(128), server_default=text("NULL::character varying"))
     deathday = db.Column(String(128), server_default=text("NULL::character varying"))
-    gender = db.Column(String(128), server_default=text("NULL::character varying"))
+    gender = db.Column(String(5), server_default=text("NULL::character varying"))
     homepage = db.Column(String(250), server_default=text("NULL::character varying"))
     tmdbid = db.Column(Integer, nullable=False, unique=True)
     imdbid = db.Column(String(128), server_default=text("NULL::character varying"))
     name = db.Column(String(250), server_default=text("NULL::character varying"))
     place_of_birth = db.Column(String(250), server_default=text("NULL::character varying"))
+    popularity = db.Column(String(20), server_default=text("NULL::character varying"))
     profile_pic = db.Column(String(500), server_default=text("NULL::character varying"))
 
     def __init__(self, *args, **kwargs):
@@ -37,7 +53,7 @@ class Actors(db.Model):
         return '<Actors %r>' % self.name
 
 
-class Movies(db.Model):
+class Movies(db.Model, CRUD):
     __tablename__ = 'movies_info'
 
     id = db.Column(Integer, primary_key=True, server_default=text("nextval('movies_info_id_seq'::regclass)"))
@@ -50,7 +66,7 @@ class Movies(db.Model):
     director = db.Column(String(1000), server_default=text("NULL::character varying"))
     writer = db.Column(String(1000), server_default=text("NULL::character varying"))
     casts = db.Column(String(500), server_default=text("NULL::character varying"))
-    plot = db.Column(String(1000), server_default=text("NULL::character varying"))
+    plot = db.Column(String(5000), server_default=text("NULL::character varying"))
     language = db.Column(String(128), server_default=text("NULL::character varying"))
     country = db.Column(String(128), server_default=text("NULL::character varying"))
     awards = db.Column(String(128), server_default=text("NULL::character varying"))
@@ -59,6 +75,9 @@ class Movies(db.Model):
     votes = db.Column(String(128), server_default=text("NULL::character varying"))
     imdbid = db.Column(String(128), nullable=False, unique=True)
     kind = db.Column(String(128), server_default=text("NULL::character varying"))
+    boxoffice = Column(String(256), server_default=text("NULL::character varying"))
+    production = Column(String(256), server_default=text("NULL::character varying"))
+    website = Column(String(256), server_default=text("NULL::character varying"))
 
     actors = db.relationship(u'Actors', secondary='actors_by_movies')
 
@@ -69,17 +88,15 @@ class Movies(db.Model):
         return '<Movies %r>' % self.title
 
 
-class Users(db.Model):
+class Users(db.Model, CRUD):
     __tablename__ = 'users'
 
     id = db.Column(Integer, primary_key=True, server_default=text("nextval('users_id_seq'::regclass)"))
     username = db.Column(String(20), nullable=False, unique=True)
     password = db.Column(String(100), nullable=False)
     email = db.Column(String(50), nullable=False, unique=True)
-    profile_pic = db.Column(String(1000), server_default=text("NULL::character varying"))
-    fname = db.Column(String(20), server_default=text("NULL::character varying"))
-    lname = db.Column(String(20), server_default=text("NULL::character varying"))
     age = db.Column(Integer)
+    fullname = db.Column(String(50), server_default=text("NULL::character varying"))
 
     movies = db.relationship(u'Movies', secondary='users_watchlist')
 
@@ -94,3 +111,16 @@ t_users_watchlist = db.Table(
     db.Column('user_id', ForeignKey(u'users.id'), primary_key=True, nullable=False),
     db.Column('movie_id', ForeignKey(u'movies_info.id'), primary_key=True, nullable=False)
 )
+
+
+class UsersSchema(ma.ModelSchema):
+    class Meta:
+        model = Users
+
+class MoviesSchema(ma.ModelSchema):
+    class Meta:
+    	model = Movies
+
+class ActorsSchema(ma.ModelSchema):
+    class Meta:
+    	model = Actors

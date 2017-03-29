@@ -1,6 +1,5 @@
 from flask import render_template, request, url_for, flash, redirect, session, abort
 from application import app
-from models import db
 from content_management import Content
 from reg_form import RegistrationForm
 from passlib.hash import sha256_crypt
@@ -9,14 +8,17 @@ import gc
 
 CONTENT = Content()
 
-db.init_app(app)
-
 from models import Actors, Movies, Users
-from blueprint import movies_blueprint, actors_blueprint, users_blueprint
-app.register_blueprint(movies_blueprint)
-app.register_blueprint(actors_blueprint)
-app.register_blueprint(users_blueprint)
 
+from flask_restful import Api
+from api_resources import *
+api = Api(app)
+
+api.add_resource(ActorsList, '/api/actors')
+api.add_resource(ActorsSearch, '/api/actors/search')
+api.add_resource(MoviesList, '/api/movies')
+api.add_resource(Movie, '/api/movies/<movie_id>')
+api.add_resource(MoviesSearch, '/api/movies/search')
 
 def login_required(f):
     @wraps(f)

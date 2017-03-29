@@ -11,6 +11,9 @@ Ubuntu documentation:
 
 ## Release History
 
+* 0.2.1
+    * REST API
+
 * 0.1.0
     * Added more JQuery functions
 
