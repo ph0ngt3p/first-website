@@ -2,12 +2,9 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Table, text
 from sqlalchemy.orm import relationship
 from flask_sqlalchemy import SQLAlchemy
-from marshmallow import validate
-from flask_marshmallow import Marshmallow
 from application import app
 
 db = SQLAlchemy(app)
-ma = Marshmallow(app)
 metadata = db.metadata
 
 t_actors_by_movies = db.Table(
@@ -45,6 +42,8 @@ class Actors(db.Model, CRUD):
     place_of_birth = db.Column(String(250), server_default=text("NULL::character varying"))
     popularity = db.Column(String(20), server_default=text("NULL::character varying"))
     profile_pic = db.Column(String(500), server_default=text("NULL::character varying"))
+
+    movies = db.relationship(u'Movies', secondary='actors_by_movies')
 
     def __init__(self, *args, **kwargs):
         super(Actors, self).__init__(*args, **kwargs)
@@ -111,16 +110,3 @@ t_users_watchlist = db.Table(
     db.Column('user_id', ForeignKey(u'users.id'), primary_key=True, nullable=False),
     db.Column('movie_id', ForeignKey(u'movies_info.id'), primary_key=True, nullable=False)
 )
-
-
-class UsersSchema(ma.ModelSchema):
-    class Meta:
-        model = Users
-
-class MoviesSchema(ma.ModelSchema):
-    class Meta:
-    	model = Movies
-
-class ActorsSchema(ma.ModelSchema):
-    class Meta:
-    	model = Actors

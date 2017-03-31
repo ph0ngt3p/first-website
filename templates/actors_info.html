@@ -35,5 +35,23 @@
       </div>
     </div>
 
+    <h4>Known for:</h4>
+
+    <div class="container" style="height:100%;padding-top:10px">
+      <div class="well">
+        <div class="row">
+          <div class="col-md-5">
+            <ul class="none-bullet">
+              {% for movie in movies %}
+                
+                  <li><img id=profilePic src="{{ movie.poster }}" alt="Movie Poster">&nbsp;&nbsp;&nbsp;<a href="{{ url_for('info', path = 'movies', object_id = movie.id) }}">{{ movie.title }}</a></li>
+                  <br>
+                    
+              {% endfor %}
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
 
 {% endblock %}

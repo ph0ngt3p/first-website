@@ -37,7 +37,7 @@
 
 <body>
 
-    <h2><strong>{{ res.title }} (<a href="{{ url_for('movie_list', query_type = 'year', path = res.year) }}">{{ res.year }}</a>) </strong></h2>
+    <h2><strong>{{ res.title }} (<a href="{{ url_for('index', query_type = 'year', path = res.year) }}">{{ res.year }}</a>) </strong></h2>
 
     <div class="container" style="height:100%;padding-top:20px">
       <div class="well">
@@ -70,27 +70,35 @@
         </div>
       </div>
     </div>
-    <h4>Top billed casts:</h4>
 
-    <div class="container" style="height:100%;padding-top:10px">
-      <div class="well">
-        <div class="row">
-          <div class="col-md-5">
-            <ul class="none-bullet">
-              {% for actor in actors %}
-                
-                {% if actor.profile_pic == None %}
-                  <li><img id=profilePic src="http://ia.media-imdb.com/images/G/01/imdb/images/nopicture/medium/name-2135195744._CB522736367_.png" alt="Actor Poster">&nbsp;&nbsp;&nbsp;<a href="{{ url_for('info', path = 'actors', object_id = actor.id) }}">{{ actor.name }}</a></li>
-                  <br>
-                {% else %}
-                  <li><img id=profilePic src="{{ 'https://image.tmdb.org/t/p/w1000' + actor.profile_pic }}" alt="Actor Poster">&nbsp;&nbsp;&nbsp;<a href="{{ url_for('info', path = 'actors', object_id = actor.id) }}">{{ actor.name }}</a></li>
-                  <br>
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-6">
+          <h3 style="padding-left:30px">Top billed casts:</h3>
+            <hr class="hr1"/>
+              <ul class="none-bullet">
+                {% for actor in actors %}
 
-                {% endif %}
-                    
-              {% endfor %}
-            </ul>
-          </div>
+                  {% if actor.profile_pic == None %}
+                    <li class="inline-display" style="margin: 0 10px"><a href="{{ url_for('info', path = 'actors', object_id = actor.id) }}">
+                    <figure class="figure">
+                      <img style="width:120px;height:170px;border-radius:20%" class="center-image figure-img img-fluid rounded img-responsive" src="http://ia.media-imdb.com/images/G/01/imdb/images/nopicture/medium/name-2135195744._CB522736367_.png" alt="Actor Poster">
+                      <figcaption class="figure-caption"><center><a href="{{ url_for('info', path = 'actors', object_id = actor.id) }}">{{ actor.name }}</a></center></figcaption>
+                    </figure>
+                    </a>
+                    </li>
+                  {% else %}
+                    <li class="inline-display" style="margin: 0 10px"><a href="{{ url_for('info', path = 'actors', object_id = actor.id) }}">
+                    <figure class="figure">
+                      <img style="width:120px;height:170px;border-radius:20%" class="center-image figure-img img-fluid rounded img-responsive" src="{{ 'https://image.tmdb.org/t/p/w1000' + actor.profile_pic }}" alt="Actor Poster">
+                      <figcaption class="figure-caption"><center><a href="{{ url_for('info', path = 'actors', object_id = actor.id) }}">{{ actor.name }}</a></center></figcaption>
+                    </figure>
+                    </a>
+                    </li>
+                  {% endif %}
+
+                {% endfor %}
+              </ul>
         </div>
       </div>
     </div>
