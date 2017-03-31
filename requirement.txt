@@ -8,6 +8,7 @@ itsdangerous==0.24
 Jinja2==2.9.5
 MarkupSafe==1.0
 marshmallow==2.13.4
+marshmallow-jsonapi==0.11.0
 marshmallow-sqlalchemy==0.13.0
 mimerender==0.6.0
 packaging==16.8
