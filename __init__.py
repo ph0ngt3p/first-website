@@ -1,18 +1,31 @@
-from flask import render_template, request, url_for, flash, redirect, session, abort
-from application import app
-from content_management import Content
-from reg_form import RegistrationForm
+from flask import Flask, render_template, request, url_for, flash, redirect, session, abort, current_app, jsonify
+from src.config.config import Content, RegistrationForm
 from passlib.hash import sha256_crypt
 from functools import wraps
+from flask_jwt_extended import JWTManager
 import gc
+import os
+
+app = Flask(__name__)
+
+app_settings = os.getenv(
+    'APP_SETTINGS',
+    'MovieDatabaseApp.src.config.config.DevelopmentConfig'
+)
+app.config.from_object(app_settings)
 
 CONTENT = Content()
 
-from models import Actors, Movies, Users
+from src.models import db, Actors, Movies, Users
 
 from flask_restful import Api
-from api_resources import *
+from src.resources.movies_resources import *
+from src.resources.actors_resources import *
+from src.resources.users_resources import *
+
+db.init_app(app)
 api = Api(app)
+jwt = JWTManager(app)
 
 api.add_resource(ActorsList, '/api/actors')
 api.add_resource(Actor, '/api/actors/<actor_id>')
@@ -20,9 +33,10 @@ api.add_resource(ActorsSearch, '/api/actors/search')
 api.add_resource(MoviesList, '/api/movies')
 api.add_resource(Movie, '/api/movies/<movie_id>')
 api.add_resource(MoviesSearch, '/api/movies/search')
-# api.add_resource(UsersList, '/api/users')
-
-from flask import session, redirect, current_app
+api.add_resource(UserRegistration, '/api/register')
+api.add_resource(User, '/api/user')
+api.add_resource(TokenRefresh, '/api/user/refresh_token')
+api.add_resource(UserActions, '/api/user/action')
 
 class back(object):
     with app.app_context():
@@ -106,7 +120,11 @@ def register_page():
         else:
 
             db.session.add(
-                Users(username=username, password=password, email=email))
+                Users(
+                    username=username, 
+                    password=password, 
+                    email=email)
+            )
             db.session.commit()
             flash("Thanks for registering!")
             gc.collect()
@@ -115,7 +133,7 @@ def register_page():
             session['username'] = username
 
             # return redirect(url_for('index'))
-            return redirect(request.referrer)
+            return back.redirect()
 
     return render_template("register.html", form=form, CONTENT=CONTENT)
 
@@ -223,4 +241,4 @@ def watchlist(name):
 	return render_template('watchlist.html', watchlist = watchlist, CONTENT = CONTENT, name = name)
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0')
+    app.run()

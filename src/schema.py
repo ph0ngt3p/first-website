@@ -17,7 +17,7 @@ class ActorsSchema(Schema):
 	popularity = fields.Float()
 	profile_pic = fields.String()
 
-	movies = fields.Nested('MoviesSchema', many=True, exclude=('actors', ), only=('id', 'title'), dump_to='known_for')
+	movies = fields.Nested('MoviesSchema', many=True, exclude=('actors', ), only=('id', 'title', 'poster', 'year'), dump_to='known_for')
 
 	class Meta:
 		type_ = 'actor'

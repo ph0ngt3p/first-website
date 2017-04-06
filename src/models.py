@@ -2,7 +2,7 @@
 from sqlalchemy import Column, ForeignKey, Integer, String, Table, text
 from sqlalchemy.orm import relationship
 from flask_sqlalchemy import SQLAlchemy
-from application import app
+from MovieDatabaseApp import app
 
 db = SQLAlchemy(app)
 metadata = db.metadata
@@ -88,23 +88,24 @@ class Movies(db.Model, CRUD):
 
 
 class Users(db.Model, CRUD):
-    __tablename__ = 'users'
+	__tablename__ = 'users'
 
-    id = db.Column(Integer, primary_key=True, server_default=text("nextval('users_id_seq'::regclass)"))
-    username = db.Column(String(20), nullable=False, unique=True)
-    password = db.Column(String(100), nullable=False)
-    email = db.Column(String(50), nullable=False, unique=True)
-    age = db.Column(Integer)
-    fullname = db.Column(String(50), server_default=text("NULL::character varying"))
+	id = db.Column(Integer, primary_key=True, server_default=text("nextval('users_id_seq'::regclass)"))
+	username = db.Column(String(20), nullable=False, unique=True)
+	password = db.Column(String(100), nullable=False)
+	email = db.Column(String(50), nullable=False, unique=True)
+	age = db.Column(Integer)
+	fullname = db.Column(String(50), server_default=text("NULL::character varying"))
 
-    movies = db.relationship(u'Movies', secondary='users_watchlist')
+	movies = db.relationship(u'Movies', secondary='users_watchlist')
 
-    def __init__(self, *args, **kwargs):
-        super(Users, self).__init__(*args, **kwargs)
+	def __init__(self, *args, **kwargs):
+		super(Users, self).__init__(*args, **kwargs)
 
-    def __repr__(self):
-        return '<User %r>' % self.username
+	def __repr__(self):
+		return '<User %r>' % self.username
 
+            
 t_users_watchlist = db.Table(
     'users_watchlist', metadata,
     db.Column('user_id', ForeignKey(u'users.id'), primary_key=True, nullable=False),
