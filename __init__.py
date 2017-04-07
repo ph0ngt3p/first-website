@@ -106,14 +106,14 @@ def register_page():
         email = form.email.data
         password = sha256_crypt.encrypt((str(form.password.data)))
 
-        x = Users.query.filter_by(username=username).count()
-        y = Users.query.filter_by(email=email).count()
+        username_check = Users.query.filter_by(username=username).count()
+        email_check = Users.query.filter_by(email=email).count()
 
-        if x > 0:
+        if username_check > 0:
             flash("That username is already taken, please choose another")
             return render_template('register.html', form=form, CONTENT=CONTENT)
 
-        elif y > 0:
+        elif email_check > 0:
             flash("That email is already used, please choose another")
             return render_template('register.html', form=form, CONTENT=CONTENT)
 

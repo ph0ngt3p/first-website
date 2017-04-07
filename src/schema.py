@@ -62,7 +62,7 @@ class UsersSchema(Schema):
 	age = fields.String()
 	fullname = fields.String()
 
-	movies = fields.Nested(MoviesSchema, many=True, only=('id', 'title'), dump_to='watchlist')
+	movies = fields.Nested(MoviesSchema, many=True, only=('id', 'title', 'poster', 'year'), dump_to='watchlist')
 
 	class Meta:
 		type_ = 'user'

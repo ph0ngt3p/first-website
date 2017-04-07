@@ -15,8 +15,26 @@ class UserRegistration(Resource):
 	def post(self):
 		post_data = request.get_json()
 		try:
-			user = Users.query.filter_by(username=post_data.get('username')).first()
-			if not user:
+			username_check = Users.query.filter_by(username=post_data.get('username')).count()
+			email_check = Users.query.filter_by(email=post_data.get('email')).count()
+
+			if username_check > 0:
+				msg = 'Username already existed. Please use a different one.'
+				responseObject = {
+					'status': 'fail',
+					'message': msg
+				}
+				return responseObject
+
+			elif email_check > 0:
+				msg = 'Email already taken. Please use a different one.'
+				responseObject = {
+					'status': 'fail',
+					'message': msg
+				}
+				return responseObject
+
+			else:
 
 				user = Users(
 					username = post_data.get('username'),
@@ -32,14 +50,6 @@ class UserRegistration(Resource):
 					'message': 'Successfully registered.',
 					'access_token': create_access_token(identity=user.id),
 					'refresh_token': create_refresh_token(identity=user.id)
-				}
-				return responseObject
-
-			else:
-				msg = 'User {} already existed.'.format(user.username)
-				responseObject = {
-					'status': 'fail',
-					'message': msg
 				}
 				return responseObject
 
@@ -66,7 +76,7 @@ class User(Resource):
 			else:
 				responseObject = {
 					'status': 'fail',
-					'message': 'User does not exist.'
+					'message': 'Invalid credentials. Please try again.'
 				}
 				return responseObject
 
@@ -126,7 +136,7 @@ class UserActions(Resource):
 
 class TokenRefresh(Resource):
 	@jwt_refresh_token_required
-	def post(self):
+	def get(self):
 		current_user = get_jwt_identity()
 		responseObject = {
 			'status': 'success',
