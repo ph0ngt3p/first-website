@@ -105,6 +105,9 @@ class Users(db.Model, CRUD):
 	def __repr__(self):
 		return '<User %r>' % self.username
 
+	def get_watchlist(self):
+		return self.movies
+
             
 t_users_watchlist = db.Table(
     'users_watchlist', metadata,

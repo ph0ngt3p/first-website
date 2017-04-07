@@ -13,7 +13,6 @@ class BaseConfig:
     DEBUG = False
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
-
 class DevelopmentConfig(BaseConfig):
     """Development configuration."""
     DEBUG = True

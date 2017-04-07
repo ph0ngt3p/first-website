@@ -1,15 +1,13 @@
 from MovieDatabaseApp.src.models import Users, Movies, db
 from MovieDatabaseApp.src.schema import UsersSchema
-from flask import request, make_response, jsonify
+from MovieDatabaseApp.src.decorators import token_required, refresh_token_required
+from flask import request, current_app
 from flask_restful import Resource, reqparse
 from flask_restful.inputs import boolean
-from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity,\
-							jwt_required, jwt_refresh_token_required
+from flask_jwt_extended import create_access_token, create_refresh_token, get_jwt_identity
 from passlib.hash import sha256_crypt
 
 schema = UsersSchema()
-
-parser = reqparse.RequestParser()
 
 class UserRegistration(Resource):
 	def post(self):
@@ -87,7 +85,7 @@ class User(Resource):
 			}
 			return responseObject
 
-	@jwt_required
+	@token_required
 	def get(self):
 		current_user = get_jwt_identity()
 		user = Users.query.filter_by(id=current_user)
@@ -95,16 +93,15 @@ class User(Resource):
 		return result
 
 class UserActions(Resource):
-	@jwt_required
+	@token_required
 	def post(self):
 		current_user = get_jwt_identity()
-		user = Users.query.filter_by(id=current_user).one()
-		action = request.json.get('action', None)
-		movie_id = request.json.get('movie_id', None)
+		user = Users.query.filter_by(id=current_user).one()	
+		post_data = request.get_json()
 
 		try:
-			if action == 'modify_watchlist':
-				movie = Movies.query.filter_by(id=movie_id).one()
+			if post_data.get('action') == 'modify_watchlist':
+				movie = Movies.query.filter_by(id=post_data.get('movie_id')).one()
 				if movie not in user.movies:
 					user.movies.append(movie)
 					db.session.commit()
@@ -135,7 +132,7 @@ class UserActions(Resource):
 			return responseObject
 
 class TokenRefresh(Resource):
-	@jwt_refresh_token_required
+	@refresh_token_required
 	def get(self):
 		current_user = get_jwt_identity()
 		responseObject = {

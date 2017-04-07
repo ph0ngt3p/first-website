@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for, flash, redirect, session, abort, current_app, jsonify
+from flask import Flask, render_template, request, url_for, flash, redirect, session, abort, current_app
 from src.config.config import Content, RegistrationForm
 from passlib.hash import sha256_crypt
 from functools import wraps
@@ -13,8 +13,9 @@ app_settings = os.getenv(
     'MovieDatabaseApp.src.config.config.DevelopmentConfig'
 )
 app.config.from_object(app_settings)
-
 CONTENT = Content()
+
+from src.decorators import login_required, BackRedirect as back
 
 from src.models import db, Actors, Movies, Users
 
@@ -37,46 +38,6 @@ api.add_resource(UserRegistration, '/api/register')
 api.add_resource(User, '/api/user')
 api.add_resource(TokenRefresh, '/api/user/refresh_token')
 api.add_resource(UserActions, '/api/user/action')
-
-class back(object):
-    with app.app_context():
-        cfg = current_app.config.get
-    cookie = cfg('REDIRECT_BACK_COOKIE', 'back')
-    default_view = cfg('REDIRECT_BACK_DEFAULT', 'index')
-
-    @staticmethod
-    def anchor(func, cookie=cookie):
-        @wraps(func)
-        def result(*args, **kwargs):
-            session[cookie] = request.url
-            return func(*args, **kwargs)
-        return result
-
-    @staticmethod
-    def url(default=default_view, cookie=cookie):
-        return session.get(cookie, url_for(default))
-
-    @staticmethod
-    def redirect(default=default_view, cookie=cookie):
-        return redirect(back.url(default, cookie))
-back = back()
-
-def login_required(f):
-    @wraps(f)
-    def wrap(*args, **kwargs):
-        if 'logged_in' in session:
-            return f(*args, **kwargs)
-        else:
-            flash("You need to login first")
-            return redirect(url_for('login_page'))
-
-    return wrap
-
-
-def get_watchlist(name):
-	user = Users.query.filter_by(username=name).one()
-	return user.movies
-
 
 @app.route('/', defaults={'path': '', 'query_type': ''})
 @app.route('/<query_type>/<path:path>/')
@@ -177,7 +138,8 @@ def info(path, object_id):
 		actors = res.actors
 		if 'logged_in' in session:
 			name = session['username']
-			watchlist = get_watchlist(name)
+			user = Users.query.filter_by(username = name).one()
+			watchlist = user.get_watchlist()
 			if res not in watchlist:
 				btn = 'Add to Watchlist'
 			else:
@@ -220,7 +182,7 @@ def modify_watchlist():
     name = session['username']
     user = Users.query.filter_by(username = name).one()
 
-    watchlist = get_watchlist(name)
+    watchlist = user.get_watchlist()
 
     if movie not in watchlist:
         user.movies.append(movie)
@@ -236,7 +198,8 @@ def modify_watchlist():
 @login_required
 def watchlist(name):
 
-	watchlist = get_watchlist(name)
+	user = Users.query.filter_by(username = name).one()
+	watchlist = user.get_watchlist()
 
 	return render_template('watchlist.html', watchlist = watchlist, CONTENT = CONTENT, name = name)
 
