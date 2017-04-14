@@ -106,7 +106,7 @@ class UserActions(Resource):
 					user.movies.append(movie)
 					db.session.commit()
 
-					msg = 'Added {} to {}\'s watchlist'.format(movie.title, user.username)
+					msg = 'Added {} to {}\'s watchlist'.format(movie.title.encode('utf-8'), user.username)
 					responseObject = {
 						'status': 'success',
 						'message': msg
@@ -117,7 +117,7 @@ class UserActions(Resource):
 					user.movies.remove(movie)
 					db.session.commit()
 
-					msg = 'Removed {} from {}\'s watchlist'.format(movie.title, user.username)
+					msg = 'Removed {} from {}\'s watchlist'.format(movie.title.encode('utf-8'), user.username)
 					responseObject = {
 						'status': 'success',
 						'message': msg

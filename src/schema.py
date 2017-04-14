@@ -17,7 +17,7 @@ class ActorsSchema(Schema):
 	popularity = fields.Float()
 	profile_pic = fields.String()
 
-	movies = fields.Nested('MoviesSchema', many=True, exclude=('actors', ), only=('id', 'title', 'poster', 'year'), dump_to='known_for')
+	movies = fields.Nested('MoviesSchema', many=True, exclude=('actors', ), only=('id', 'title', 'poster', 'year', 'rating'), dump_to='known_for')
 
 	class Meta:
 		type_ = 'actor'
@@ -47,7 +47,7 @@ class MoviesSchema(Schema):
 	production = fields.String()
 	website = fields.String()
 
-	actors = fields.Nested(ActorsSchema, many=True, only=('id', 'name'))
+	actors = fields.Nested(ActorsSchema, many=True, only=('id', 'name', 'profile_pic'))
 
 	class Meta:
 		type_ = 'movie'
@@ -62,7 +62,7 @@ class UsersSchema(Schema):
 	age = fields.String()
 	fullname = fields.String()
 
-	movies = fields.Nested(MoviesSchema, many=True, only=('id', 'title', 'poster', 'year'), dump_to='watchlist')
+	movies = fields.Nested(MoviesSchema, many=True, only=('id', 'title', 'poster', 'year', 'rating', 'casts'), dump_to='watchlist')
 
 	class Meta:
 		type_ = 'user'
