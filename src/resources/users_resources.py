@@ -1,4 +1,4 @@
-from MovieDatabaseApp.src.models import Users, Movies, db
+from MovieDatabaseApp.src.models import Users, Movies, UserRating, db
 from MovieDatabaseApp.src.schema import UsersSchema
 from MovieDatabaseApp.src.decorators import token_required, refresh_token_required
 from flask import request, current_app
@@ -106,7 +106,7 @@ class UserActions(Resource):
 					user.movies.append(movie)
 					db.session.commit()
 
-					msg = 'Added {} to {}\'s watchlist'.format(movie.title.encode('utf-8'), user.username)
+					msg = 'Added \'{}\' to {}\'s watchlist'.format(movie.title.encode('utf-8'), user.username)
 					responseObject = {
 						'status': 'success',
 						'message': msg
@@ -117,12 +117,35 @@ class UserActions(Resource):
 					user.movies.remove(movie)
 					db.session.commit()
 
-					msg = 'Removed {} from {}\'s watchlist'.format(movie.title.encode('utf-8'), user.username)
+					msg = 'Removed \'{}\' from {}\'s watchlist'.format(movie.title.encode('utf-8'), user.username.encode('utf-8'))
 					responseObject = {
 						'status': 'success',
 						'message': msg
 					}
 					return responseObject
+
+			if post_data.get('action') == 'rate_movie':
+				movie = Movies.query.filter_by(id=post_data.get('movie_id')).one()
+				rated_check = UserRating.query.filter_by(movie_id=post_data.get('movie_id'), \
+							user_id=user.id)
+				if rated_check.count() > 0:
+					rated_check.delete()
+
+				rating = UserRating(
+					user_id = user.id,
+					movie_id = post_data.get('movie_id'),
+					ratings = post_data.get('rating')
+				)
+
+				db.session.add(rating)
+				db.session.commit()
+
+				msg = 'User {} rated \'{}\' {}'.format(user.username.encode('utf-8'), movie.title.encode('utf-8'), post_data.get('rating'))
+				responseObject = {
+					'status': 'success',
+					'message': msg
+				}
+				return responseObject
 
 		except Exception as e:
 			responseObject = {

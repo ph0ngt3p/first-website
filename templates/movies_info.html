@@ -22,7 +22,6 @@
 	        });
 	    });
 
-
 	function changeText(){
         $('#watchlistbutton').val($('#watchlistbutton').val() == 'Add to Watchlist' ? 'Remove from Watchlist' : 'Add to Watchlist');
     }
@@ -54,8 +53,14 @@
           </div>
           <div class="col-md-5">
             <ul class="none-bullet" style="text-align:left">
-              <h3><li><strong>{{ res.rating }}/10 </strong>({{ res.votes }} votes)</li></h3>
+              <h3><li><strong>{{ avg_rating }}/10 </strong>({{ votes_count }} votes)</li></h3>
               <br>
+              <div class="input-group">
+                <input type="text" class="form-control" name="rate" placeholder="Your rating" value=""/>
+                <div class="input-group-btn">
+                  <button class="btn btn-default" type="submit">Rate</button>
+                </div>
+              </div>
               <br>
               <li><strong>Genre: </strong><a href="#">{{ res.genre }}</a></li>
               <br>

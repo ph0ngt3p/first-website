@@ -1,10 +1,11 @@
 # coding: utf-8
-from sqlalchemy import Column, ForeignKey, Integer, String, Table, text
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, ForeignKey, Integer, String, Float, Table, text, create_engine
+from sqlalchemy.orm import relationship, backref
 from flask_sqlalchemy import SQLAlchemy
 from MovieDatabaseApp import app
 
 db = SQLAlchemy(app)
+engine = create_engine(app.config['SQLALCHEMY_DATABASE_URI'])
 metadata = db.metadata
 
 t_actors_by_movies = db.Table(
@@ -53,38 +54,38 @@ class Actors(db.Model, CRUD):
 
 
 class Movies(db.Model, CRUD):
-    __tablename__ = 'movies_info'
+	__tablename__ = 'movies_info'
 
-    id = db.Column(Integer, primary_key=True, server_default=text("nextval('movies_info_id_seq'::regclass)"))
-    title = db.Column(String(128), server_default=text("NULL::character varying"))
-    year = db.Column(String(128), server_default=text("NULL::character varying"))
-    rated = db.Column(String(128), server_default=text("NULL::character varying"))
-    released = db.Column(String(128), server_default=text("NULL::character varying"))
-    runtime = db.Column(String(128), server_default=text("NULL::character varying"))
-    genre = db.Column(String(128), server_default=text("NULL::character varying"))
-    director = db.Column(String(1000), server_default=text("NULL::character varying"))
-    writer = db.Column(String(1000), server_default=text("NULL::character varying"))
-    casts = db.Column(String(500), server_default=text("NULL::character varying"))
-    plot = db.Column(String(5000), server_default=text("NULL::character varying"))
-    language = db.Column(String(128), server_default=text("NULL::character varying"))
-    country = db.Column(String(128), server_default=text("NULL::character varying"))
-    awards = db.Column(String(128), server_default=text("NULL::character varying"))
-    poster = db.Column(String(1000), server_default=text("NULL::character varying"))
-    rating = db.Column(String(128), server_default=text("NULL::character varying"))
-    votes = db.Column(String(128), server_default=text("NULL::character varying"))
-    imdbid = db.Column(String(128), nullable=False, unique=True)
-    kind = db.Column(String(128), server_default=text("NULL::character varying"))
-    boxoffice = Column(String(256), server_default=text("NULL::character varying"))
-    production = Column(String(256), server_default=text("NULL::character varying"))
-    website = Column(String(256), server_default=text("NULL::character varying"))
+	id = db.Column(Integer, primary_key=True, server_default=text("nextval('movies_info_id_seq'::regclass)"))
+	title = db.Column(String(128), server_default=text("NULL::character varying"))
+	year = db.Column(String(128), server_default=text("NULL::character varying"))
+	rated = db.Column(String(128), server_default=text("NULL::character varying"))
+	released = db.Column(String(128), server_default=text("NULL::character varying"))
+	runtime = db.Column(String(128), server_default=text("NULL::character varying"))
+	genre = db.Column(String(128), server_default=text("NULL::character varying"))
+	director = db.Column(String(1000), server_default=text("NULL::character varying"))
+	writer = db.Column(String(1000), server_default=text("NULL::character varying"))
+	casts = db.Column(String(500), server_default=text("NULL::character varying"))
+	plot = db.Column(String(5000), server_default=text("NULL::character varying"))
+	language = db.Column(String(128), server_default=text("NULL::character varying"))
+	country = db.Column(String(128), server_default=text("NULL::character varying"))
+	awards = db.Column(String(128), server_default=text("NULL::character varying"))
+	poster = db.Column(String(1000), server_default=text("NULL::character varying"))
+	rating = db.Column(String(128), server_default=text("NULL::character varying"))
+	votes = db.Column(String(128), server_default=text("NULL::character varying"))
+	imdbid = db.Column(String(128), nullable=False, unique=True)
+	kind = db.Column(String(128), server_default=text("NULL::character varying"))
+	boxoffice = Column(String(256), server_default=text("NULL::character varying"))
+	production = Column(String(256), server_default=text("NULL::character varying"))
+	website = Column(String(256), server_default=text("NULL::character varying"))
 
-    actors = db.relationship(u'Actors', secondary='actors_by_movies')
+	actors = db.relationship(u'Actors', secondary='actors_by_movies')
 
-    def __init__(self, *args, **kwargs):
-        super(Movies, self).__init__(*args, **kwargs)
+	def __init__(self, *args, **kwargs):
+		super(Movies, self).__init__(*args, **kwargs)
 
-    def __repr__(self):
-        return '<Movies %r>' % self.title
+	def __repr__(self):
+		return '<Movies %r>' % self.title
 
 
 class Users(db.Model, CRUD):
@@ -107,6 +108,24 @@ class Users(db.Model, CRUD):
 
 	def get_watchlist(self):
 		return self.movies
+
+
+class UserRating(db.Model, CRUD):
+	__tablename__ = 'user_ratings'
+
+	id = db.Column(Integer, primary_key=True, server_default=text("nextval('user_ratings_id_seq'::regclass)"))
+	user_id = db.Column(ForeignKey(u'users.id'), nullable=False)
+	movie_id = db.Column(ForeignKey(u'movies_info.id'), nullable=False)
+	ratings = db.Column(Float(53), nullable=False)
+
+	movie = db.relationship(u'Movies')
+	user = db.relationship(u'Users')
+
+	def __init__(self, *args, **kwargs):
+		super(UserRating, self).__init__(*args, **kwargs)
+
+	def __repr__(self):
+		return '<Rating %r>' % self.ratings
 
             
 t_users_watchlist = db.Table(

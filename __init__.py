@@ -3,6 +3,8 @@ from src.config.config import Content, RegistrationForm
 from passlib.hash import sha256_crypt
 from functools import wraps
 from flask_jwt_extended import JWTManager
+from sqlalchemy.sql import func
+from sqlalchemy.orm.exc import NoResultFound
 import gc
 import os
 
@@ -17,7 +19,7 @@ CONTENT = Content()
 
 from src.decorators import login_required, BackRedirect as back
 
-from src.models import db, Actors, Movies, Users
+from src.models import db, engine, Actors, Movies, Users, UserRating
 
 from flask_restful import Api
 from src.resources.movies_resources import *
@@ -144,9 +146,22 @@ def info(path, object_id):
 				btn = 'Add to Watchlist'
 			else:
 				btn = 'Remove from Watchlist'
+			try:
+				rating_query = db.session.query(UserRating.movie_id.label('mid'), \
+							func.avg(UserRating.ratings).label('average')).\
+							group_by(UserRating.movie_id).filter_by(movie_id = object_id).one()
+				votes_query = db.session.query(UserRating.movie_id.label('mid'), \
+							func.count(UserRating.ratings).label('count')).\
+							group_by(UserRating.movie_id).filter_by(movie_id = object_id).one()
+				avg_rating = rating_query.average
+				votes_count = votes_query.count
+			except NoResultFound:
+				avg_rating = "..."
+				votes_count = 0
+				
 		else:
 			btn = 'Add to Watchlist'
-		return render_template('movies_info.html', res=res, CONTENT=CONTENT, actors=actors, btn=btn)
+		return render_template('movies_info.html', res=res, CONTENT=CONTENT, actors=actors, btn=btn, avg_rating = avg_rating, votes_count = votes_count)
 	elif path == 'actors':
 		res = Actors.query.filter_by(id=object_id).one()
 		movies = res.movies
