@@ -55,6 +55,7 @@ class RatingsSchema(Schema):
 	id = fields.Integer(dump_only=True)
 	user_id = fields.Integer(dump_only=True)
 	movie_id = fields.Integer(dump_only=True)
+	movie = fields.Nested(MoviesSchema, only=('id', 'title', 'poster', 'year'))
 	ratings = fields.Float(dump_to='rating')
 
 	class Meta:
@@ -71,7 +72,7 @@ class UsersSchema(Schema):
 	fullname = fields.String()
 
 	movies = fields.Nested(MoviesSchema, many=True, only=('id', 'title', 'poster', 'year', 'rating', 'casts'), dump_to='watchlist')
-	rated_movies = fields.Nested(RatingsSchema, many=True, only=('id', 'movie_id', 'ratings'))
+	rated_movies = fields.Nested(RatingsSchema, many=True, only=('id', 'movie', 'ratings'))
 
 	class Meta:
 		type_ = 'user'

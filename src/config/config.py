@@ -19,7 +19,7 @@ class DevelopmentConfig(BaseConfig):
     SQLALCHEMY_DATABASE_URI = postgres_local_base + database_name
     JWT_HEADER_TYPE = ''
     JWT_HEADER_NAME = 'Token'
-    JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(minutes=30)
+    JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(hours=1)
 
 class RegistrationForm(Form):
 	username = TextField('Username', [validators.Length(min=4, max=20)])
