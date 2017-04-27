@@ -72,7 +72,7 @@ class UsersSchema(Schema):
 	fullname = fields.String()
 
 	movies = fields.Nested(MoviesSchema, many=True, only=('id', 'title', 'poster', 'year', 'rating', 'casts'), dump_to='watchlist')
-	rated_movies = fields.Nested(RatingsSchema, many=True, only=('id', 'movie', 'ratings'))
+	rated_movies = fields.Nested(RatingsSchema, many=True, only=('id', 'movie', 'movie_id', 'ratings'))
 
 	class Meta:
 		type_ = 'user'
