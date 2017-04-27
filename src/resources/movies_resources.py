@@ -3,6 +3,7 @@ from MovieDatabaseApp.src.schema import MoviesSchema
 from sqlalchemy.sql import func
 from flask_restful import Resource, reqparse
 from flask_restful.inputs import boolean
+
 schema = MoviesSchema()
 
 parser = reqparse.RequestParser()
@@ -20,9 +21,9 @@ class Movie(Resource):
 		query = Movies.query.filter_by(id = movie_id)
 		results = schema.dump(query, many=True).data
 		for item in results['data']:
-			item['attributes']['rating'] = db.session.query(func.avg(UserRating.ratings).\
+			item['attributes']['rating'] = round(db.session.query(func.avg(UserRating.ratings).\
 										label('average')).group_by(UserRating.movie_id).\
-										filter_by(movie_id = item['id']).one().average
+										filter_by(movie_id = item['id']).one().average, 1)
 			item['attributes']['votes'] = db.session.query(func.count(UserRating.ratings).\
 										label('count')).group_by(UserRating.movie_id).\
 										filter_by(movie_id = item['id']).one().count
@@ -43,9 +44,9 @@ class MoviesList(Resource):
 		results = schema.dump(query, many=True).data
 
 		for item in results['data']:
-			item['attributes']['rating'] = db.session.query(func.avg(UserRating.ratings).\
+			item['attributes']['rating'] = round(db.session.query(func.avg(UserRating.ratings).\
 										label('average')).group_by(UserRating.movie_id).\
-										filter_by(movie_id = item['id']).one().average
+										filter_by(movie_id = item['id']).one().average, 1)
 			item['attributes']['votes'] = db.session.query(func.count(UserRating.ratings).\
 										label('count')).group_by(UserRating.movie_id).\
 										filter_by(movie_id = item['id']).one().count
@@ -67,9 +68,9 @@ class MoviesSearch(Resource):
 		results = schema.dump(query, many=True).data
 
 		for item in results['data']:
-			item['attributes']['rating'] = db.session.query(func.avg(UserRating.ratings).\
+			item['attributes']['rating'] = round(db.session.query(func.avg(UserRating.ratings).\
 										label('average')).group_by(UserRating.movie_id).\
-										filter_by(movie_id = item['id']).one().average
+										filter_by(movie_id = item['id']).one().average, 1)
 			item['attributes']['votes'] = db.session.query(func.count(UserRating.ratings).\
 										label('count')).group_by(UserRating.movie_id).\
 										filter_by(movie_id = item['id']).one().count

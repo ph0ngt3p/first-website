@@ -1,6 +1,7 @@
 from MovieDatabaseApp.src.models import Users, Movies, UserRating, db
 from MovieDatabaseApp.src.schema import UsersSchema
 from MovieDatabaseApp.src.decorators import token_required, refresh_token_required
+from sqlalchemy.sql import func
 from flask import request, current_app
 from flask_restful import Resource, reqparse
 from flask_restful.inputs import boolean
@@ -90,6 +91,10 @@ class User(Resource):
 		current_user = get_jwt_identity()
 		user = Users.query.filter_by(id=current_user)
 		result = schema.dump(user, many=True).data
+		for movie in result['data'][0]['attributes']['watchlist']['data']:
+			movie['attributes']['rating'] = round(db.session.query(func.avg(UserRating.ratings).\
+										label('average')).group_by(UserRating.movie_id).\
+										filter_by(movie_id = movie['id']).one().average, 1)
 		return result
 
 class UserActions(Resource):

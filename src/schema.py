@@ -51,6 +51,16 @@ class MoviesSchema(Schema):
 		type_ = 'movie'
 		ordered = True
 
+class RatingsSchema(Schema):
+	id = fields.Integer(dump_only=True)
+	user_id = fields.Integer(dump_only=True)
+	movie_id = fields.Integer(dump_only=True)
+	ratings = fields.Float(dump_to='rating')
+
+	class Meta:
+		type_ = 'rating'
+		ordered = True
+
 class UsersSchema(Schema):
 	not_blank = validate.Length(min=1, error='Field cannot be blank')
 	id = fields.Integer(dump_only=True)
@@ -61,6 +71,7 @@ class UsersSchema(Schema):
 	fullname = fields.String()
 
 	movies = fields.Nested(MoviesSchema, many=True, only=('id', 'title', 'poster', 'year', 'rating', 'casts'), dump_to='watchlist')
+	rated_movies = fields.Nested(RatingsSchema, many=True, only=('id', 'movie_id', 'ratings'))
 
 	class Meta:
 		type_ = 'user'

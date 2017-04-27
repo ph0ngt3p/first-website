@@ -1,6 +1,6 @@
 # coding: utf-8
 from sqlalchemy import Column, ForeignKey, Integer, String, Float, Table, text, create_engine
-from sqlalchemy.orm import relationship, backref
+from sqlalchemy.orm import relationship
 from flask_sqlalchemy import SQLAlchemy
 from MovieDatabaseApp import app
 
@@ -99,6 +99,7 @@ class Users(db.Model, CRUD):
 	fullname = db.Column(String(50), server_default=text("NULL::character varying"))
 
 	movies = db.relationship(u'Movies', secondary='users_watchlist')
+	rated_movies = db.relationship(u'UserRating')
 
 	def __init__(self, *args, **kwargs):
 		super(Users, self).__init__(*args, **kwargs)

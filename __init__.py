@@ -153,7 +153,7 @@ def info(path, object_id):
 				votes_query = db.session.query(UserRating.movie_id.label('mid'), \
 							func.count(UserRating.ratings).label('count')).\
 							group_by(UserRating.movie_id).filter_by(movie_id = object_id).one()
-				avg_rating = rating_query.average
+				avg_rating = round(rating_query.average, 1)
 				votes_count = votes_query.count
 			except NoResultFound:
 				avg_rating = "..."
