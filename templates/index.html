@@ -1,0 +1,27 @@
+{% extends "header.html" %}
+
+{% block img %}
+	width: 100px;
+	height: 135px;
+{% endblock %}
+
+{% block body %}
+
+<body>
+	<section class="about-section" style="height:100%;padding-top:100px;padding:50px 50px">
+	  <br><br><br>
+	  <div id="news-feed-rss">
+	    <h3 style="padding:0px 50px">News</h3>
+	    <!-- start feedwind code --> <script type="text/javascript" src="https://feed.mikle.com/js/fw-loader.js" data-fw-param="18989/"></script> <!-- end feedwind code -->
+	  </div>
+	  <hr class="hr1">
+
+	  <br><br><br>
+	  <div id="reviews-feed-rss">
+	    <h3 style="padding:0px 50px">Reviews</h3> 
+	    <!-- start feedwind code --> <script type="text/javascript" src="https://feed.mikle.com/js/fw-loader.js" data-fw-param="18988/"></script> <!-- end feedwind code -->
+	  </div>
+	</section>
+</body>
+
+{% endblock %}
