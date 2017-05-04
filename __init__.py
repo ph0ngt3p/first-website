@@ -41,7 +41,12 @@ api.add_resource(User, '/api/user')
 api.add_resource(TokenRefresh, '/api/user/refresh_token')
 api.add_resource(UserActions, '/api/user/action')
 
-@app.route('/', defaults={'path': '', 'query_type': ''})
+@app.route('/')
+@back.anchor
+def homepage():
+	return render_template('index.html', CONTENT=CONTENT)
+
+@app.route('/movies', defaults={'path': '', 'query_type': ''})
 @app.route('/<query_type>/<path:path>/')
 @back.anchor
 def index(query_type, path):
