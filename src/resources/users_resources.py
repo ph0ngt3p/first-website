@@ -91,10 +91,6 @@ class User(Resource):
 		current_user = get_jwt_identity()
 		user = Users.query.filter_by(id=current_user)
 		result = schema.dump(user, many=True).data
-		for movie in result['data'][0]['attributes']['watchlist']['data']:
-			movie['attributes']['rating'] = round(db.session.query(func.avg(UserRating.ratings).\
-										label('average')).group_by(UserRating.movie_id).\
-										filter_by(movie_id = movie['id']).one().average, 1)
 		return result
 
 class UserActions(Resource):
@@ -143,6 +139,15 @@ class UserActions(Resource):
 				)
 
 				db.session.add(rating)
+				db.session.commit()
+
+				movie.rating = round(db.session.query(func.avg(UserRating.ratings).\
+							label('average')).group_by(UserRating.movie_id).\
+							filter_by(movie_id = post_data.get('movie_id')).one().average, 1)
+				movie.votes = db.session.query(func.count(UserRating.ratings).\
+							label('count')).group_by(UserRating.movie_id).\
+							filter_by(movie_id = post_data.get('movie_id')).one().count
+
 				db.session.commit()
 
 				msg = 'User {} rated \'{}\' {}'.format(user.username.encode('utf-8'), movie.title.encode('utf-8'), post_data.get('rating'))

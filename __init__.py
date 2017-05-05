@@ -150,23 +150,10 @@ def info(path, object_id):
 			if res not in watchlist:
 				btn = 'Add to Watchlist'
 			else:
-				btn = 'Remove from Watchlist'
-			try:
-				rating_query = db.session.query(UserRating.movie_id.label('mid'), \
-							func.avg(UserRating.ratings).label('average')).\
-							group_by(UserRating.movie_id).filter_by(movie_id = object_id).one()
-				votes_query = db.session.query(UserRating.movie_id.label('mid'), \
-							func.count(UserRating.ratings).label('count')).\
-							group_by(UserRating.movie_id).filter_by(movie_id = object_id).one()
-				avg_rating = round(rating_query.average, 1)
-				votes_count = votes_query.count
-			except NoResultFound:
-				avg_rating = "..."
-				votes_count = 0
-				
+				btn = 'Remove from Watchlist'		
 		else:
 			btn = 'Add to Watchlist'
-		return render_template('movies_info.html', res=res, CONTENT=CONTENT, actors=actors, btn=btn, avg_rating = avg_rating, votes_count = votes_count)
+		return render_template('movies_info.html', res=res, CONTENT=CONTENT, actors=actors, btn=btn)
 	elif path == 'actors':
 		res = Actors.query.filter_by(id=object_id).one()
 		movies = res.movies

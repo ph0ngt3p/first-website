@@ -39,6 +39,8 @@ class MoviesSchema(Schema):
 	country = fields.String()
 	awards = fields.String()
 	poster = fields.String()
+	rating = fields.Float()
+	votes = fields.Integer()
 	imdbid = fields.String()
 	kind = fields.String()
 	boxoffice = fields.String()
