@@ -1,12 +1,16 @@
 from flask import Flask, render_template, request, url_for, flash, redirect, session, abort, current_app
-from src.config.config import Content, RegistrationForm
+from src.config.config import Content, RegistrationForm, NewPasswordForm
 from passlib.hash import sha256_crypt
 from functools import wraps
 from flask_jwt_extended import JWTManager
+from datetime import date
 from sqlalchemy.sql import func
 from sqlalchemy.orm.exc import NoResultFound
+import dateutil.parser as dparser
 import gc
-import os
+import os, sys
+
+sys.path.append(os.path.join(os.path.dirname(__file__), ".."))
 
 app = Flask(__name__)
 
@@ -46,23 +50,29 @@ api.add_resource(UserActions, '/api/user/action')
 def homepage():
 	return render_template('index.html', CONTENT=CONTENT)
 
-@app.route('/movies', defaults={'path': '', 'query_type': ''})
+@app.route('/movies', defaults={'path': '', 'query_type': ''}, methods=["GET"])
 @app.route('/<query_type>/<path:path>/')
 @back.anchor
 def index(query_type, path):
-    if query_type is '' and path is '':
-        res = Movies.query.all()
-    elif query_type == 'genre' and path in CONTENT["Top genre"]:
-        genr = '%{0}%'.format(path)
-        res = Movies.query.filter(Movies.genre.ilike(
-            genr)).order_by(Movies.rating.desc())
-    elif query_type == 'year':
-    	res = Movies.query.filter(Movies.year.ilike(
-    	    path)).order_by(Movies.rating.desc())
-    else:
-        abort(404)
-    return render_template('main.html', res=res, CONTENT=CONTENT, path=path, query_type=query_type)
-
+	page = int(request.args['page'])
+	if query_type is '' and path is '':
+		res = Movies.query.order_by(Movies.rating.desc()).paginate(page, 15)
+	elif query_type == 'genre':
+		genre = '%{0}%'.format(path)
+		res = Movies.query.filter(Movies.genre.ilike(
+			genre)).order_by(Movies.rating.desc()).paginate(page, 15)
+	elif query_type == 'year':
+		res = Movies.query.filter(Movies.year.ilike(
+			path)).order_by(Movies.rating.desc()).paginate(page, 15)
+	else:
+		abort(404)
+	if 'logged_in' in session:
+		name = session['username']
+		user = Users.query.filter_by(username = name).one()
+		watchlist = user.get_watchlist()
+		return render_template('movielist.html', res=res, watchlist=watchlist, CONTENT=CONTENT, genre=path, query_type=query_type)
+	else:
+		return render_template('movielist.html', res=res, CONTENT=CONTENT, genre=path, query_type=query_type)
 
 @app.route('/register', methods=['GET', 'POST'])
 def register_page():
@@ -79,11 +89,11 @@ def register_page():
 
         if username_check > 0:
             flash("That username is already taken, please choose another")
-            return render_template('register.html', form=form, CONTENT=CONTENT)
+            return render_template('register-v2.html', form=form, CONTENT=CONTENT)
 
         elif email_check > 0:
             flash("That email is already used, please choose another")
-            return render_template('register.html', form=form, CONTENT=CONTENT)
+            return render_template('register-v2.html', form=form, CONTENT=CONTENT)
 
         else:
 
@@ -103,7 +113,7 @@ def register_page():
             # return redirect(url_for('index'))
             return back.redirect()
 
-    return render_template("register.html", form=form, CONTENT=CONTENT)
+    return render_template("register-v2.html", form=form)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -120,15 +130,14 @@ def login_page():
                 session['username'] = request.form['username']
                 whalecum = 'Welcome back {0}!'.format(request.form['username'])
                 flash(whalecum)
-                # return redirect(url_for("index"))
-                return back.redirect()
+                return redirect(url_for("index", page=1))
             else:
                 error = "Invalid credentials, try again."
                 flash(error)
 
         gc.collect()
 
-        return render_template("login.html", error=error, CONTENT=CONTENT)
+        return render_template("login-v2.html", error=error)
 
     except Exception as e:
         error = "Invalid credentials, try again."
@@ -136,6 +145,20 @@ def login_page():
         flash(error)
         return redirect(url_for("login_page"))
 
+@app.route('/change_password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    form = NewPasswordForm(request.form)
+    user = Users.query.filter_by(username=session['username']).one()
+    if request.method == "POST" and form.validate():
+        if sha256_crypt.verify(request.form['old_password'], user.password):
+            user.password = sha256_crypt.encrypt((str(form.new_password.data)))
+            flash('Password changed successfully.')
+            db.session.commit()
+            return back.redirect()
+        else:
+            flash('Invalid password')
+    return render_template('change_password.html', form=form)
 
 @app.route('/<path:path>/id/<object_id>')
 @back.anchor
@@ -161,7 +184,26 @@ def info(path, object_id):
 	else:
 		abort(404)
 
+@app.route('/actors/popular/')
+@back.anchor
+def popular_celebs():
+	res = db.session.query(Actors).order_by(Actors.popularity.desc()).limit(50)
+	return render_template("popular_celebs.html", res=res, CONTENT=CONTENT)
+
+@app.route('/actors/born_today/')
+@back.anchor
+def born_today():
+    today = date.today()
+    day = '%{}-{}'.format(today.month, today.day)
+    def age(date_str):
+        today = date.today()
+        birthday = dparser.parse(date_str)
+        return today.year - birthday.year - int((today.month, today.day) < (birthday.month, birthday.day))
+    res = Actors.query.filter(Actors.birthday.ilike(day), Actors.deathday == '')
+    return render_template("born_today.html", res=res, CONTENT=CONTENT, age=age)
+
 @app.route('/search_result/', methods = ['POST'])
+@back.anchor
 def search():
 
     string = request.form['search']
@@ -170,7 +212,8 @@ def search():
     mov_res = Movies.query.filter(Movies.title.ilike(search_str))
     act_res = Actors.query.filter(Actors.name.ilike(search_str))
 
-    return render_template('search_result.html', mov_res = mov_res, act_res = act_res, CONTENT = CONTENT)
+    return render_template('search_results-v2.html', search_str = string, mov_res = mov_res, mov_count = mov_res.count(), \
+                                                act_res = act_res, act_count = act_res.count(), CONTENT = CONTENT)
 
 @app.route('/logout')
 @login_required
@@ -208,7 +251,17 @@ def watchlist(name):
 	user = Users.query.filter_by(username = name).one()
 	watchlist = user.get_watchlist()
 
-	return render_template('watchlist.html', watchlist = watchlist, CONTENT = CONTENT, name = name)
+	return render_template('watchlist-v2.html', watchlist = watchlist, CONTENT = CONTENT, name = name)
+
+@app.route('/rated_movies/', defaults = {'name' : ''})
+@app.route('/rated_movies/<name>')
+@login_required
+def rated_movies(name):
+
+    user = Users.query.filter_by(username = name).one()
+    rated = user.rated_movies
+
+    return render_template('rated_movies.html', rated = rated, CONTENT = CONTENT, name = name)
 
 if __name__ == "__main__":
     app.run()

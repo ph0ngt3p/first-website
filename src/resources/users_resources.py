@@ -125,13 +125,13 @@ class UserActions(Resource):
 					}
 					return responseObject
 
-			if post_data.get('action') == 'rate_movie':
+			elif post_data.get('action') == 'rate_movie':
 				movie = Movies.query.filter_by(id=post_data.get('movie_id')).one()
 				rated_check = UserRating.query.filter_by(movie_id=post_data.get('movie_id'), \
 							user_id=user.id)
 				if rated_check.count() > 0:
 					rated_check.delete()
-
+	
 				rating = UserRating(
 					user_id = user.id,
 					movie_id = post_data.get('movie_id'),
@@ -139,7 +139,6 @@ class UserActions(Resource):
 				)
 
 				db.session.add(rating)
-				db.session.commit()
 
 				movie.rating = round(db.session.query(func.avg(UserRating.ratings).\
 							label('average')).group_by(UserRating.movie_id).\
@@ -153,8 +152,11 @@ class UserActions(Resource):
 				msg = 'User {} rated \'{}\' {}'.format(user.username.encode('utf-8'), movie.title.encode('utf-8'), post_data.get('rating'))
 				responseObject = {
 					'status': 'success',
-					'message': msg
+					'message': msg,
+					'rating': movie.rating,
+					'votes': movie.votes
 				}
+
 				return responseObject
 
 		except Exception as e:

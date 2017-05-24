@@ -1,0 +1,116 @@
+// Margin and Padding
+// ========================================================================
+
+// variable
+// -----------------------
+$as_lengths: 0, 3, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 80 !default;
+
+@each $breakpoint in map-keys($grid-breakpoints) {
+  @include media-breakpoint-up($breakpoint) {
+    $infix: breakpoint-infix($breakpoint, $grid-breakpoints);
+
+    @each $prop, $abbrev in (margin: m, padding: p) {
+      @each $length in $as_lengths {
+        $value : if($length != 0, $length * 1px, 0);
+
+        .#{$abbrev}#{$infix}-#{$length}  { #{$prop}:        $value !important; }
+        .#{$abbrev}t#{$infix}-#{$length} { #{$prop}-top:    $value !important; }
+        .#{$abbrev}r#{$infix}-#{$length} { #{$prop}-right:  $value !important; }
+        .#{$abbrev}b#{$infix}-#{$length} { #{$prop}-bottom: $value !important; }
+        .#{$abbrev}l#{$infix}-#{$length} { #{$prop}-left:   $value !important; }
+        .#{$abbrev}x#{$infix}-#{$length} {
+          #{$prop}-right: $value !important;
+          #{$prop}-left:  $value !important;
+        }
+        .#{$abbrev}y#{$infix}-#{$length} {
+          #{$prop}-top:    $value !important;
+          #{$prop}-bottom: $value !important;
+        }
+      }
+    }
+
+    // Some special margin utils
+    .m#{$infix}-auto  { margin:        auto !important; }
+    .mt#{$infix}-auto { margin-top:    auto !important; }
+    .mr#{$infix}-auto { margin-right:  auto !important; }
+    .mb#{$infix}-auto { margin-bottom: auto !important; }
+    .ml#{$infix}-auto { margin-left:   auto !important; }
+    .mx#{$infix}-auto {
+      margin-right: auto !important;
+      margin-left:  auto !important;
+    }
+    .my#{$infix}-auto {
+      margin-top:    auto !important;
+      margin-bottom: auto !important;
+    }
+  }
+}
+
+
+// // Other margin helper
+// .m-x-auto {
+//   margin-right: auto !important;
+//   margin-left:  auto !important;
+// }
+
+// @include media-breakpoint-down(sm) {
+//   .m-xs-0 {
+//     margin: 0 !important;
+//   }
+// }
+
+// @include media-breakpoint-up(md) {
+//   .m-sm-0 {
+//     margin: 0 !important;
+//   }
+// }
+
+// @include media-breakpoint-up(lg) {
+//   .m-md-0 {
+//     margin: 0 !important;
+//   }
+// }
+
+// @include media-breakpoint-up(xl) {
+//   .m-lg-0 {
+//     margin: 0 !important;
+//   }
+// }
+
+// @include media-breakpoint-up(xxl) {
+//   .m-xl-0 {
+//     margin: 0 !important;
+//   }
+// }
+
+// // Other padding helper
+// @include media-breakpoint-down(sm) {
+//   .p-xs-0 {
+//     padding: 0 !important;
+//   }
+// }
+
+// @include media-breakpoint-up(md) {
+//   .p-sm-0 {
+//     padding: 0 !important;
+//   }
+// }
+
+// @include media-breakpoint-up(lg) {
+//   .p-md-0 {
+//     padding: 0 !important;
+//   }
+// }
+
+// @include media-breakpoint-up(xl) {
+//   .p-lg-0 {
+//     padding: 0 !important;
+//   }
+// }
+
+// @include media-breakpoint-up(xxl) {
+//   .p-xl-0 {
+//     padding: 0 !important;
+//   }
+// }
+

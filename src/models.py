@@ -41,7 +41,7 @@ class Actors(db.Model, CRUD):
     imdbid = db.Column(String(128), server_default=text("NULL::character varying"))
     name = db.Column(String(250), server_default=text("NULL::character varying"))
     place_of_birth = db.Column(String(250), server_default=text("NULL::character varying"))
-    popularity = db.Column(String(20), server_default=text("NULL::character varying"))
+    popularity = db.Column(Float(53))
     profile_pic = db.Column(String(500), server_default=text("NULL::character varying"))
 
     movies = db.relationship(u'Movies', secondary='actors_by_movies')
@@ -126,7 +126,7 @@ class UserRating(db.Model, CRUD):
 		super(UserRating, self).__init__(*args, **kwargs)
 
 	def __repr__(self):
-		return '<Rating %r>' % self.ratings
+		return '<Movies %r>' % self.movie
 
             
 t_users_watchlist = db.Table(

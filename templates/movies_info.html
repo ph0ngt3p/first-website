@@ -14,9 +14,10 @@
     $(document).ready(function() {
 	    $('#watchlistbutton').click(function() {
 	            // alert($(this).val());
+              $(this).find($(".fa")).toggleClass('fa-plus').toggleClass('fa-minus');
 	            $.ajax({
 	            	url: '{{ url_for('modify_watchlist') }}', 
-	            	data: { movieid: {{ res.id }} } 
+	            	data: { movieid: $(this).attr("value") } 
 	            });
 				   return false;
 	        });
@@ -44,12 +45,10 @@
           <div class="col-md-6">
               <img class="img-responsive" src="{{ res.poster }}" alt="Movie Poster">
 
-              {% if session.logged_in %}
-              <input id="watchlistbutton" type="button" name="add" value="{{ btn }}" onclick="changeText()">
-              {% else %}
-              <input id="guestbutton" type="button" name="add" value="{{ btn }}" onclick="credentialRequired()">
-              <p id=loginrequired></p>
-              {% endif %}
+                    <button id="watchlistbutton" type="button" class="btn btn-icon btn-round" data-toggle="tooltip"
+                    data-original-title="Add to watchlist" style="background-color:transparent;position:absolute;bottom:10px;right:10px;" value="{{ res.id }}">
+                      <i class="fa fa-plus" aria-hidden="true"></i>
+                    </button>
           </div>
           <div class="col-md-5">
             <ul class="none-bullet" style="text-align:left">

@@ -10,11 +10,15 @@ parser.add_argument('string', type=str, required=False)
 parser.add_argument('orderby', type=str, required=False)
 parser.add_argument('desc', type=boolean)
 parser.add_argument('limit', type=int)
+parser.add_argument('birthday', type=str, required=False)
 
 class ActorsList(Resource):
 	def get(self):
 		args = parser.parse_args(strict=True)
 		query = Actors.query.all()
+		if args['birthday']:
+			birthday = '%{0}'.format(args['birthday'])
+			query = Actors.query.filter(Actors.birthday.ilike(birthday))
 
 		results = schema.dump(query, many=True).data
 
