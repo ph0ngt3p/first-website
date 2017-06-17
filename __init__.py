@@ -1,5 +1,4 @@
 from flask import Flask, render_template, request, url_for, flash, redirect, session, abort, current_app
-from src.config.config import Content, RegistrationForm, NewPasswordForm
 from passlib.hash import sha256_crypt
 from functools import wraps
 from flask_jwt_extended import JWTManager
@@ -16,19 +15,22 @@ app = Flask(__name__)
 
 app_settings = os.getenv(
     'APP_SETTINGS',
-    'MovieDatabaseApp.src.config.config.DevelopmentConfig'
+    'MovieDatabaseApp.config.DevelopmentConfig'
 )
 app.config.from_object(app_settings)
-CONTENT = Content()
 
 from src.decorators import login_required, BackRedirect as back
+from src.contents import Content
 
-from src.models import db, engine, Actors, Movies, Users, UserRating
+CONTENT = Content()
+
+from src.model.models import db, engine, Actors, Movies, Users, UserRating
+from src.model.forms import RegistrationForm, NewPasswordForm
 
 from flask_restful import Api
-from src.resources.movies_resources import *
-from src.resources.actors_resources import *
-from src.resources.users_resources import *
+from src.controller.movies_resources import *
+from src.controller.actors_resources import *
+from src.controller.users_resources import *
 
 db.init_app(app)
 api = Api(app)
@@ -48,7 +50,7 @@ api.add_resource(UserActions, '/api/user/action')
 @app.route('/')
 @back.anchor
 def homepage():
-	return render_template('index.html', CONTENT=CONTENT)
+	return render_template('homepage.html')
 
 @app.route('/movies', defaults={'path': '', 'query_type': ''}, methods=["GET"])
 @app.route('/<query_type>/<path:path>/')
@@ -56,14 +58,14 @@ def homepage():
 def index(query_type, path):
 	page = int(request.args['page'])
 	if query_type is '' and path is '':
-		res = Movies.query.order_by(Movies.rating.desc()).paginate(page, 15)
+		res = Movies.query.order_by(Movies.rating.desc()).paginate(page, 12)
 	elif query_type == 'genre':
 		genre = '%{0}%'.format(path)
 		res = Movies.query.filter(Movies.genre.ilike(
-			genre)).order_by(Movies.rating.desc()).paginate(page, 15)
+			genre)).order_by(Movies.rating.desc()).paginate(page, 12)
 	elif query_type == 'year':
 		res = Movies.query.filter(Movies.year.ilike(
-			path)).order_by(Movies.rating.desc()).paginate(page, 15)
+			path)).order_by(Movies.rating.desc()).paginate(page, 12)
 	else:
 		abort(404)
 	if 'logged_in' in session:
@@ -170,17 +172,18 @@ def info(path, object_id):
 			name = session['username']
 			user = Users.query.filter_by(username = name).one()
 			watchlist = user.get_watchlist()
-			if res not in watchlist:
-				btn = 'Add to Watchlist'
-			else:
-				btn = 'Remove from Watchlist'		
+
+			rated_check = UserRating.query.filter_by(movie_id=res.id, user_id=user.id)
+			rated = 0
+			if rated_check.count() > 0:
+				rated = rated_check.one().ratings
+			return render_template('movie-profile-v2.html', res=res, rated=rated, CONTENT=CONTENT, actors=actors, watchlist=watchlist)
 		else:
-			btn = 'Add to Watchlist'
-		return render_template('movies_info.html', res=res, CONTENT=CONTENT, actors=actors, btn=btn)
+			return render_template('movie-profile-v2.html', res=res, CONTENT=CONTENT, actors=actors)
 	elif path == 'actors':
 		res = Actors.query.filter_by(id=object_id).one()
 		movies = res.movies
-		return render_template('actors_info.html', res=res, movies=movies, CONTENT=CONTENT)
+		return render_template('actor-profile-v2.html', res=res, movies=movies, CONTENT=CONTENT)
 	else:
 		abort(404)
 
@@ -240,6 +243,39 @@ def modify_watchlist():
     else:
         user.movies.remove(movie)
         db.session.commit()
+
+    gc.collect()
+
+@app.route('/rate_movie')
+@login_required
+def rate_movie():
+    mid = request.args.get('movieid', 0, type=str)
+    rating = request.args.get('rating', 0, type=float)
+    movie = Movies.query.filter_by(id = mid).one()
+
+    name = session['username']
+    user = Users.query.filter_by(username = name).one()
+
+    rated_check = UserRating.query.filter_by(movie_id=mid, user_id=user.id)
+    if rated_check.count() > 0:
+        rated_check.delete()
+
+    rating = UserRating(
+        user_id = user.id,
+        movie_id = mid,
+        ratings = rating
+    )
+
+    db.session.add(rating)
+
+    movie.rating = round(db.session.query(func.avg(UserRating.ratings).\
+                label('average')).group_by(UserRating.movie_id).\
+                filter_by(movie_id = mid).one().average, 1)
+    movie.votes = db.session.query(func.count(UserRating.ratings).\
+                label('count')).group_by(UserRating.movie_id).\
+                filter_by(movie_id = mid).one().count
+
+    db.session.commit()
 
     gc.collect()
 

@@ -50,7 +50,7 @@
   <!--[if lt IE 8]>
         <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
-  <nav class="site-navbar navbar navbar-default navbar-fixed-top navbar-mega" role="navigation">
+  <nav class="site-navbar navbar navbar-default navbar-fixed-top navbar-mega navbar-inverse" role="navigation">
     <div class="navbar-header">
       <button type="button" class="navbar-toggler hamburger hamburger-close navbar-toggler-left hided"
       data-toggle="menubar">
@@ -150,14 +150,14 @@
           <ul class="site-menu" data-plugin="menu">
             <li class="site-menu-category"></li>
             <li class="site-menu-item has-sub">
-              <a href="javascript:void(0)">
-                <i class="site-menu-icon wb-dashboard" aria-hidden="true"></i>
+              <a href="{{ url_for('homepage') }}">
+                <i class="site-menu-icon wb-home" aria-hidden="true"></i>
                 <span class="site-menu-title">Home</span>
               </a>
             </li>
             <li class="site-menu-item has-sub">
               <a href="javascript:void(0)">
-                <i class="site-menu-icon wb-layout" aria-hidden="true"></i>
+                <i class="site-menu-icon fa-film" aria-hidden="true"></i>
                 <span class="site-menu-title">Movies</span>
                 <span class="site-menu-arrow"></span>
               </a>
@@ -186,7 +186,7 @@
             </li>
             <li class="site-menu-item has-sub">
               <a href="javascript:void(0)">
-                <i class="site-menu-icon wb-file" aria-hidden="true"></i>
+                <i class="site-menu-icon wb-users" aria-hidden="true"></i>
                 <span class="site-menu-title">Celebrities</span>
                 <span class="site-menu-arrow"></span>
               </a>
@@ -209,13 +209,13 @@
             <li class="site-menu-category">Your ICTMDb</li>
             <li class="site-menu-item has-sub">
               <a href="{{ url_for('watchlist', name = session['username']) }}">
-                <i class="site-menu-icon wb-bookmark" aria-hidden="true"></i>
+                <i class="site-menu-icon wb-video" aria-hidden="true"></i>
                 <span class="site-menu-title">Your Watchlist</span>
               </a>
             </li>
             <li class="site-menu-item has-sub active">
               <a href="{{ url_for('rated_movies', name = session['username']) }}">
-                <i class="site-menu-icon wb-bookmark" aria-hidden="true"></i>
+                <i class="site-menu-icon wb-star-half" aria-hidden="true"></i>
                 <span class="site-menu-title">Your Rating</span>
               </a>
             </li>
@@ -251,8 +251,8 @@
             <tbody>
               {% for movie in rated %}
                 <tr>
-                <td><a href= "{{ url_for('info', path = 'movies', object_id = movie.id) }}"><img style='height: 50%; width: 50%; object-fit: contain' src="{{ movie.movie.poster }}"/></a></td>
-                <td><a href= "{{ url_for('info', path = 'movies', object_id = movie.id) }}"><strong>{{ movie.movie.title }}</strong></a></td>
+                <td><a href= "{{ url_for('info', path = 'movies', object_id = movie.movie.id) }}"><img style='height: 50%; width: 50%; object-fit: contain' src="{{ movie.movie.poster }}"/></a></td>
+                <td><a href= "{{ url_for('info', path = 'movies', object_id = movie.movie.id) }}"><strong>{{ movie.movie.title }}</strong></a></td>
                 <td><strong>{{ movie.ratings }}</strong></td>
                 </tr>
               {% endfor %}

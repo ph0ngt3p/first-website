@@ -1,5 +1,5 @@
-from MovieDatabaseApp.src.models import Actors
-from MovieDatabaseApp.src.schema import ActorsSchema
+from MovieDatabaseApp.src.model.models import Actors
+from MovieDatabaseApp.src.model.schema import ActorsSchema
 from flask_restful import Resource, reqparse
 from flask_restful.inputs import boolean
 schema = ActorsSchema()

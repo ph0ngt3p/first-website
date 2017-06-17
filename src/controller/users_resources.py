@@ -1,5 +1,5 @@
-from MovieDatabaseApp.src.models import Users, Movies, UserRating, db
-from MovieDatabaseApp.src.schema import UsersSchema
+from MovieDatabaseApp.src.model.models import Users, Movies, UserRating, db
+from MovieDatabaseApp.src.model.schema import UsersSchema
 from MovieDatabaseApp.src.decorators import token_required, refresh_token_required
 from sqlalchemy.sql import func
 from flask import request, current_app

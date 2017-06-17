@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html class="no-js css-menubar" lang="en">
+
 <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui">
   <meta name="description" content="bootstrap admin template">
   <meta name="author" content="">
-  <title>Change password</title>
+  <title>ICTMDb</title>
   <link rel="apple-touch-icon" href="static/assets/images/apple-touch-icon.png">
-  <link rel="shortcut icon" href="static/assets/images/favicon.ico">
+  <link rel="shortcut icon" href="static/favicon.ico">
   <!-- Stylesheets -->
   <link rel="stylesheet" href="static/global/css/bootstrap.min.css">
   <link rel="stylesheet" href="static/global/css/bootstrap-extend.min.css">
-  <link rel="stylesheet" href="static/assets/css/site.min.css">
+  <link rel="stylesheet" href="static/css/site1.min.css">
   <!-- Plugins -->
   <link rel="stylesheet" href="static/global/vendor/animsition/animsition.css">
   <link rel="stylesheet" href="static/global/vendor/asscrollable/asScrollable.css">
@@ -20,9 +21,7 @@
   <link rel="stylesheet" href="static/global/vendor/intro-js/introjs.css">
   <link rel="stylesheet" href="static/global/vendor/slidepanel/slidePanel.css">
   <link rel="stylesheet" href="static/global/vendor/flag-icon-css/flag-icon.css">
-  <link rel="stylesheet" href="static/assets/examples/css/pages/forgot-password.css">
-  <link rel="stylesheet" href="{{ url_for('static', filename = 'global/vendor/toastr/toastr.css') }}">
-  <link rel="stylesheet" href="{{ url_for('static', filename = 'assets/examples/css/advanced/toastr.css') }}">
+  <link rel="stylesheet" href="static/css/login1.css">
   <!-- Fonts -->
   <link rel="stylesheet" href="static/global/fonts/web-icons/web-icons.min.css">
   <link rel="stylesheet" href="static/global/fonts/brand-icons/brand-icons.min.css">
@@ -37,36 +36,24 @@
   <!-- Scripts -->
   <script src="static/global/vendor/breakpoints/breakpoints.js"></script>
   <script>
-  Breakpoints();
+    Breakpoints();
   </script>
 </head>
-<body class="animsition page-forgot-password layout-full">
-  <!--[if lt IE 8]>
-        <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-    <![endif]-->
-  <!-- Page -->
-  <div class="page vertical-align text-center" data-animsition-in="fade-in" data-animsition-out="fade-out">
+
+<body class="animsition page-login layout-full page-dark">
+  <div class="page vertical-align text-center" data-animsition-in="fade-in" data-animsition-out="fade-out">>
     <div class="page-content vertical-align-middle animation-slide-top animation-duration-1">
-      <h2>Change Your Password ?</h2>
-      <p>Enter your old and new password</p>
-      {% from "_formhelpers.html" import render_field %}
-      <form method="post" action="{{ url_for('change_password') }}">
-        <div class="form-group">
-          {{ render_field(form.old_password) }}
+      <div class="brand">
+        <img class="brand-img" src="static/favicon.ico" style="width: auto; height: auto;max-width: 72px;max-height: 72px" alt="...">
+        <h2 class="brand-text">ICTMDb</h2>
+        <div class="container-fluid">
+          <button type="button" name="login" id="login-button" class="btn btn-primary">Log In</button>
+          <button type="button" name="explore" id="explore-button" class="btn btn-primary">Explore</button>
         </div>
-        <div class="form-group">
-          {{ render_field(form.new_password) }}
-        </div>
-        <div class="form-group">
-          {{ render_field(form.confirm) }}
-        </div>
-        <div class="form-group">
-          <button type="submit" class="btn btn-primary btn-block">Change Your Password</button>
-        </div>
-      </form>
-      <footer class="page-copyright">
+      </div>
+        <p>WEBSITE BY ICT</p>
+        <p>© 2017. All RIGHT RESERVED.</p>
         <div class="social">
-          <p><a href="{{ url_for('homepage') }}">Home</a></p>
           <a href="javascript:void(0)">
             <i class="icon bd-twitter" aria-hidden="true"></i>
           </a>
@@ -96,7 +83,7 @@
   <script src="static/global/vendor/intro-js/intro.js"></script>
   <script src="static/global/vendor/screenfull/screenfull.js"></script>
   <script src="static/global/vendor/slidepanel/jquery-slidePanel.js"></script>
-  <script src="{{ url_for('static', filename = 'global/vendor/toastr/toastr.js') }}"></script>
+  <script src="static/global/vendor/jquery-placeholder/jquery.placeholder.js"></script>
   <!-- Scripts -->
   <script src="static/global/js/State.js"></script>
   <script src="static/global/js/Component.js"></script>
@@ -111,33 +98,43 @@
   <script src="static/global/js/config/colors.js"></script>
   <script src="static/assets/js/config/tour.js"></script>
   <script>
-  Config.set('assets', 'static/assets');
+    Config.set('assets', 'static/assets');
   </script>
   <!-- Page -->
   <script src="static/assets/js/Site.js"></script>
   <script src="static/global/js/Plugin/asscrollable.js"></script>
   <script src="static/global/js/Plugin/slidepanel.js"></script>
   <script src="static/global/js/Plugin/switchery.js"></script>
-  <script src="{{ url_for('static', filename = 'global/js/Plugin/toastr.js') }}"></script>
+  <script src="static/global/js/Plugin/jquery-placeholder.js"></script>
   <script>
-  (function(document, window, $) {
-    'use strict';
-    var Site = window.Site;
-    $(document).ready(function() {
-      Site.run();
+    (function(document, window, $) {
+      'use strict';
+      var Site = window.Site;
+      $(document).ready(function() {
+        Site.run();
+      });
+    })(document, window, jQuery);
+  </script>
+  <script>
+    $("#login-button").click(function(){
+      window.location = "{{ url_for('login_page') }}";
     });
-  })(document, window, jQuery);
+    $("#explore-button").click(function(){
+      window.location = "{{ url_for('index', page=1) }}";
+    })
+
   </script>
 
-  {% with messages = get_flashed_messages() %}
-  {% if messages %}
-      <script>
-        var messages = {{ messages | safe }};
-        for (var i=0; i<messages.length; i++) {
-            toastr.error(messages[i])
-        }
-      </script>
-  {% endif %}
-  {% endwith %}
+  	{% with messages = get_flashed_messages() %}
+	{% if messages %}
+	    <script>
+	      var messages = {{ messages | safe }};
+	      for (var i=0; i<messages.length; i++) {
+	      		toastr.success(messages[i])
+	      }
+	    </script>
+	{% endif %}
+  	{% endwith %}
 </body>
+
 </html>

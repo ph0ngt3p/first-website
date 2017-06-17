@@ -71,7 +71,7 @@ class Movies(db.Model, CRUD):
 	country = db.Column(String(128), server_default=text("NULL::character varying"))
 	awards = db.Column(String(128), server_default=text("NULL::character varying"))
 	poster = db.Column(String(1000), server_default=text("NULL::character varying"))
-	rating = db.Column(String(128), server_default=text("NULL::character varying"))
+	rating = db.Column(Float(53), nullable=False)
 	votes = db.Column(String(128), server_default=text("NULL::character varying"))
 	imdbid = db.Column(String(128), nullable=False, unique=True)
 	kind = db.Column(String(128), server_default=text("NULL::character varying"))

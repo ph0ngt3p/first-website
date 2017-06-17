@@ -1,5 +1,5 @@
-from MovieDatabaseApp.src.models import Movies, db, UserRating
-from MovieDatabaseApp.src.schema import MoviesSchema
+from MovieDatabaseApp.src.model.models import Movies, db, UserRating
+from MovieDatabaseApp.src.model.schema import MoviesSchema
 from sqlalchemy.sql import func
 from flask_restful import Resource, reqparse
 from flask_restful.inputs import boolean

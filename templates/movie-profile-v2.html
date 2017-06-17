@@ -28,10 +28,20 @@
   <link rel="stylesheet" href="{{ url_for('static', filename = 'global/vendor/bootstrap-sweetalert/sweetalert.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename = 'global/vendor/toastr/toastr.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename = 'assets/examples/css/advanced/toastr.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename = 'assets/examples/css/advanced/rating.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename = 'assets/examples/css/advanced/masonry.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename = 'assets/examples/css/pages/profile.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename = 'global/vendor/aspieprogress/asPieProgress.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename = 'assets/examples/css/charts/pie-progress.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename = 'global/vendor/owl-carousel/owl.carousel.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename = 'global/vendor/slick-carousel/slick.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename = 'assets/examples/css/uikit/carousel.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename = 'css/jquery.raty.css') }}">
   <!-- Fonts -->
   <link rel="stylesheet" href="{{ url_for('static', filename = 'global/fonts/font-awesome/font-awesome.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename = 'global/fonts/web-icons/web-icons.min.css') }}">
   <link rel="stylesheet" href="{{ url_for('static', filename = 'global/fonts/brand-icons/brand-icons.min.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename = 'global/fonts/glyphicons/glyphicons.css') }}">
   <link rel='stylesheet' href='http://fonts.googleapis.com/css?family=Roboto:300,400,500,300italic'>
   <!--[if lt IE 9]>
     <script src="{{ url_for('static', filename = 'global/vendor/html5shiv/html5shiv.min.js') }}"></script>
@@ -45,8 +55,23 @@
   <script>
   Breakpoints();
   </script>
+
+  <style media="screen">
+    #poster{
+      width: 271.8px;
+    }
+    .float-left{
+      float: left;
+    }
+    .center{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+  </style>
 </head>
-<body class="animsition site-menubar-unfold site-menubar-keep">
+<body class="animsition site-menubar-unfold site-menubar-keep page-profile">
   <!--[if lt IE 8]>
         <p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
     <![endif]-->
@@ -155,7 +180,7 @@
                 <span class="site-menu-title">Home</span>
               </a>
             </li>
-            <li class="site-menu-item has-sub">
+            <li class="site-menu-item has-sub active">
               <a href="javascript:void(0)">
                 <i class="site-menu-icon fa-film" aria-hidden="true"></i>
                 <span class="site-menu-title">Movies</span>
@@ -207,7 +232,7 @@
               </ul>
             </li>
             <li class="site-menu-category">Your ICTMDb</li>
-            <li class="site-menu-item has-sub active">
+            <li class="site-menu-item has-sub">
               <a href="{{ url_for('watchlist', name = session['username']) }}">
                 <i class="site-menu-icon wb-video" aria-hidden="true"></i>
                 <span class="site-menu-title">Your Watchlist</span>
@@ -219,53 +244,170 @@
                 <span class="site-menu-title">Your Rating</span>
               </a>
             </li>
+          </ul>
         </div>
       </div>
     </div>
   </div>
-  <!-- Page -->
-  
-<!-- Panel FixedHeader -->
+
   <div class="page">
-    <div class="page-header">
-      <h1 class="page-title">{{ name }}'s Watchlist</h1>
-    </div>
-    <div class="page-content">
-      <div class="panel">
-        <div class="panel-body">
-          <table class="table table-hover dataTable table-striped w-full" data-plugin="dataTable">
-            <thead>
-              <tr>
-                <th></th>
-                <th>Title</th>
-                <th>Year</th>
-                <th>Rating</th>
-              </tr>
-            </thead>
-            <tfoot>
-              <tr>
-                <th></th>
-                <th>Title</th>
-                <th>Year</th>
-                <th>Rating</th>
-              </tr>
-            </tfoot>
-            <tbody>
-              {% for movie in watchlist %}
-                <tr>
-                <td><a href= "{{ url_for('info', path = 'movies', object_id = movie.id) }}"><img style='height: 50%; width: 50%; object-fit: contain' src="{{ movie.poster }}"/></a></td>
-                <td><a href= "{{ url_for('info', path = 'movies', object_id = movie.id) }}"><strong>{{ movie.title }}</strong></a></td>
-                <td><strong>{{ movie.year }}</strong></td>
-                <td><strong>{{ movie.rating }}</strong></td>
-                </tr>
-              {% endfor %}
-            </table>
+    <div class="page-content container-fluid">
+      <div class="row row-lg">
+        <div class="col-lg-5">
+          <!-- Page Widget -->
+          <div class="card card-shadow text-center">
+            <h3 class="profile-user">{{ res.title }} ({{ res.year }})</h3>
+            <div class="card-block" style="padding-top:0px;">
+                <img class="img-responsive" src="{{ res.poster }}" alt="..." id="poster">
+            </div>
+          </div>
+          <!-- End Page Widget -->
+        </div>
+        <div class="col-lg-7">
+          <!-- Panel -->
+          <div class="panel">
+            <div class="panel-body">
+            <div class="container-fluid">
+              <div class="row">
+                <div class="col-sm-3">
+                  <div class="pie-progress pie-progress-sm" id="pieliedie"
+                  data-plugin="pieProgress" data-barcolor="#89bceb"
+                  data-size="500" data-barsize="50" data-goal="70" role="progressbar">
+                    <div class="pie-progress-content">
+                      <div class="pie-progress-number">{{ res.rating }}</div>
+                      <div class="pie-progress-label">{{ res.votes }} vote(s)</div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-sm-8" >
+                  <div class="container-fluid" style="position:relative;top: calc(50% - 25px);">
+                  <div class="center">
+                    {% if session.logged_in %}
+                    	{% if rated %}
+	                      <a class="btn btn-primary btn-outline" id="button-raty"
+	                      data-toggle="tooltip" 
+	                      data-original-title="You rated this movie {{ rated }}"
+	                      href="javascript:void(0)" role="button"><i class="fa fa-star" aria-hidden="true" style="color:orange;"></i></a>
+	                    {% else %}
+	                      <a class="btn btn-primary btn-outline" id="button-raty"
+	                      data-toggle="tooltip" 
+	                      data-original-title="Rate this movie"
+	                      href="javascript:void(0)" role="button"><i class="fa fa-star" aria-hidden="true" ></i></a>
+	                    {% endif %}
+                    {% else %}
+                      <a class="btn btn-primary btn-outline" id="guestbutton"
+                      data-toggle="tooltip" 
+                      data-original-title="Rate this movie"
+                      href="javascript:void(0)" role="button"><i class="fa fa-star" aria-hidden="true"></i></a>
+                    {% endif %}
+                    <a class="btn btn-outline" id="cancel"
+                      data-toggle="tooltip" 
+                      data-original-title="Cancel"
+                      href="javascript:void(0)" role="button" style="display:none;"><i class="fa fa-close" aria-hidden="true"></i></a>                
+                    <div id="star" data-number="10" data-value="{{ res.title }}"
+                          data-score="{{ rated }}" style="display:none;"></div>
+                    </div>
+                    </div>
+                </div>
+                <div class="col-sm-1">
+                  <div class="container-fluid center" style="position:relative;top: calc(50% - 25px)">
+                    {% if session.logged_in %}
+                          {% if res in watchlist %}
+                          <a class="btn btn-primary btn-outline" id="watchlistbutton"
+                          data-toggle="tooltip" 
+                          data-original-title="Remove from watchlist"
+                          href="javascript:void(0)" role="button" data-value="{{ res.id }}"
+                          data-custom-value="{{ res.title }}"><i class="fa fa-check" aria-hidden="true" ></i></a>
+                          {% else %}
+                          <a class="btn btn-primary btn-outline" id="watchlistbutton"
+                          data-toggle="tooltip" 
+                          data-original-title="Add to watchlist"
+                          href="javascript:void(0)" role="button" data-value="{{ res.id }}"
+                          data-custom-value="{{ res.title }}"><i class="fa fa-plus" aria-hidden="true"></i></a>
+                          {% endif %}
+                    {% else %}
+                          <a class="btn btn-primary btn-outline" id="guestbutton"
+                          data-toggle="tooltip" 
+                          data-original-title="Add to watchlist"
+                          href="javascript:void(0)" role="button"><i class="fa fa-plus" aria-hidden="true"></i></a>
+                    {% endif %}
+                  </div>
+                </div>
+                </div>
+                </div>
+                <div style="margin-top:50px">
+                <h4>MPAA rating: {{ res.rated }}</h4>
+                <div class="row">
+                  <div class="col-sm-6">                      
+                      <h4>Released</h4>
+                      <p>{{ res.released }}</p>
+                      <h4>Genre</h4>
+                      <p>{{ res.genre }}</p>       
+                      <h4>Production</h4>
+                      <p>{{ res.production }}</p>
+                      <h4>Country</h4>
+                      <p>{{ res.country }}</p>
+                  </div>
+                  <div class="col-sm-6">                         
+                      <h4>Director</h4>
+                      <p>{{ res.director }}</p>
+                      <h4>Writer</h4>
+                      <p>{{ res.writer }}</p>
+                      <h4>Box Office</h4>
+                      <p>{{ res.boxoffice }}</p>
+                      <h4>Awards</h4>
+                      <p>{{ res.awards }}</p>                  
+                  </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- End Panel -->
+        </div>
+        <div class="panel">
+          <div class="panel-body container-fluid">
+            <h3 class="panel-title">Overview</h3>
+              <p>{{ res.plot }}</p>
+            </div>
+            </div>
+      </div>
+
+      <div class="row row-lg">
+        <div class="panel" style="width:100%">
+          <div class="panel-body">
+            <h3 class="panel-title">Top Billed Casts:</h3>
+            <!-- Example Api Methods -->
+            <div class="owl-carousel owl-carousel-portfolio owl-carousel-navOut" id="owl-items">
+                {% for actor in actors %}
+
+                  {% if actor.profile_pic == None %}
+                    <div class="item card center">
+                      <img class="card-img-top img-responsive owl-lazy" src="http://ia.media-imdb.com/images/G/01/imdb/images/nopicture/medium/name-2135195744._CB522736367_.png" data-src="http://ia.media-imdb.com/images/G/01/imdb/images/nopicture/medium/name-2135195744._CB522736367_.png" alt="..." style="width:200px;height:300;">
+                      <div class="card-block px-0">
+                        <h4 class="card-title"><a href="{{ url_for('info', path = 'actors', object_id = actor.id) }}">{{ actor.name }}</a></h4>
+                      </div>
+                    </div>
+                  {% else %}
+                    <div class="item card center">
+                      <img class="card-img-top img-responsive owl-lazy" src="{{ 'https://image.tmdb.org/t/p/w1000' + actor.profile_pic }}" data-src="{{ 'https://image.tmdb.org/t/p/w1000' + actor.profile_pic }}" alt="..." style="width:200px;height:300;">
+                      <div class="card-block px-0">
+                        <h4 class="card-title"><a href="{{ url_for('info', path = 'actors', object_id = actor.id) }}">{{ actor.name }}</a></h4>
+                      </div>
+                    </div>
+                  {% endif %}
+
+                {% endfor %}
+              </div>
+            </div>
+            </div>
+          </div>
+            <!-- End Example Api Methods -->
           </div>
         </div>
-      <!-- End Panel FixedHeader -->
+      </div>
     </div>
   </div>
-  
   <!-- End Page -->
   <!-- Footer -->
   
@@ -297,6 +439,12 @@
   <script src="{{ url_for('static', filename = 'global/vendor/bootbox/bootbox.js') }}"></script>
   <script src="{{ url_for('static', filename = 'global/vendor/bootstrap-sweetalert/sweetalert.js') }}"></script>
   <script src="{{ url_for('static', filename = 'global/vendor/toastr/toastr.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'global/vendor/masonry/masonry.pkgd.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'global/vendor/imagesloaded/imagesloaded.pkgd.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'global/vendor/raty/jquery.raty.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'global/vendor/aspieprogress/jquery-asPieProgress.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'global/vendor/owl-carousel/owl.carousel.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'global/vendor/slick-carousel/slick.js') }}"></script>
   <!-- Scripts -->
   <script src="{{ url_for('static', filename = 'global/js/State.js') }}"></script>
   <script src="{{ url_for('static', filename = 'global/js/Component.js') }}"></script>
@@ -323,6 +471,13 @@
   <script src="{{ url_for('static', filename = 'global/js/Plugin/bootstrap-sweetalert.js') }}"></script>
   <script src="{{ url_for('static', filename = 'global/js/Plugin/toastr.js') }}"></script>
   <script src="{{ url_for('static', filename = 'assets/examples/js/advanced/bootbox-sweetalert.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'global/js/Plugin/raty.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'global/js/Plugin/masonry.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'global/js/Plugin/aspieprogress.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'assets/examples/js/charts/pie-progress.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'global/js/Plugin/owl-carousel.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'assets/examples/js/uikit/carousel.js') }}"></script>
+  <script src="{{ url_for('static', filename = 'assets/examples/js/pages/profile-v2.js') }}"></script>
 
 	{% with messages = get_flashed_messages() %}
 	{% if messages %}
@@ -333,6 +488,80 @@
 	      }
 	    </script>
 	{% endif %}
-  	{% endwith %}
+		{% endwith %}
+
+  <script type="text/javascript">
+    $(document).on('click','#watchlistbutton', function() {
+          // alert($(this).val());
+          $(this).find($(".fa")).toggleClass('fa-plus').toggleClass('fa-check');
+          $(this).attr('data-original-title', function(index, attr){
+            return attr == 'Add to watchlist' ? 'Remove from watchlist' : 'Add to watchlist';
+          });
+          if ($(this).attr('data-original-title') == 'Add to watchlist') {
+          	var string = 'Removed \"' + $(this).data("custom-value") + '\" from watchlist';
+          } else {
+          	var string = 'Added \"' + $(this).data("custom-value") + '\" to watchlist';
+          }
+          toastr.success(string);
+          $.ajax({
+            url: '{{ url_for('modify_watchlist') }}', 
+            data: { movieid: $(this).data("value") } 
+          });
+       return false;
+      });
+
+    $(document).on('click','#guestbutton', function() {
+    	toastr.warning('You need to login first.')
+      });
+
+	  $(document).ready(function() {
+	    $("#button-raty").click(function(){
+	        $("#star").show();
+	        $("#cancel").show();
+	        $('#button-raty').hide();
+	    });
+	    $("#cancel").click(function(){
+	        $("#star").hide();
+	        $("#cancel").hide();
+	        $('#button-raty').show();
+	    });
+
+      var owl = $('#owl-items');
+      owl.owlCarousel({
+        margin: 30,
+        nav: true,
+        items: 3,
+        lazyLoad:true,
+      });
+      
+      $('#pieliedie').asPieProgress('go', {{ 10*res.rating }});
+	  });
+
+	  $.fn.raty.defaults.path = '{{ url_for('static', filename = 'images') }}';
+
+	  $(function() {
+	    var movie_id = {{ res.id }};
+	    $('#star').raty({
+        starOn: "full20.png",
+        starOff: "off20.png",
+	      hints: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+	      number: function() {
+	        return $(this).attr('data-number');
+	      },
+	      click: function(score, evt) {
+	      	var roundedScore = (Math.round(score * 2) / 2).toFixed(1);
+	        $.ajax({
+	          url: '{{ url_for('rate_movie') }}', 
+	          data: { movieid: movie_id, rating: roundedScore } 
+	        });
+	        var string = 'Rated \"' + $(this).data("value") + '\" ' + roundedScore;
+	        toastr.success(string);
+	      },
+	      score: function() {
+	        return $(this).attr('data-score');
+	      }
+	    });
+	  });
+  </script>
 </body>
 </html>
